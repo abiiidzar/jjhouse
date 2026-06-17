@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+[data-sidebar] {
+    transition: width 0.3s ease, transform 0.3s ease;
+}
+
+[data-sidebar-overlay] {
+    display: none;
+}
+
+[data-inline-sidebar] {
+    transition: all 0.3s ease;
+}
+
+[data-inline-sidebar].inline-sidebar-closed [data-inline-sidebar-body] {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    [data-sidebar-layout] [data-sidebar] {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 50;
+        transform: translateX(-100%);
+    }
+
+    [data-sidebar-layout].sidebar-mobile-open [data-sidebar] {
+        transform: translateX(0);
+    }
+
+    [data-sidebar-layout].sidebar-mobile-open [data-sidebar-overlay] {
+        display: block;
+    }
+}
+
+@media (min-width: 768px) {
+    [data-sidebar-layout].sidebar-collapsed [data-sidebar] {
+        width: 0;
+        transform: translateX(-100%);
+        overflow: hidden;
+    }
+}
+.container-3d{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    overflow:hidden;
+}
+
+.box-3d{
+    position: relative;
+    transform-style: preserve-3d;
+    animation: spinText 8s ease-in-out infinite alternate;
+}
+
+.box-3d span{
+    position:absolute;
+    top:50%;
+    left:50%;
+
+    font-size:4rem;
+    font-weight:900;
+    text-transform:uppercase;
+    white-space:nowrap;
+
+    padding:0 12px;
+    color:white;
+
+    line-height:0.8em;
+
+    transform-style: preserve-3d;
+
+    text-shadow:0 10px 20px rgba(0,0,0,0.4);
+
+    background:linear-gradient(
+        90deg,
+        rgba(255,255,255,0.05),
+        rgba(255,255,255,0.2),
+        transparent
+    );
+
+    transform:
+        translate(-50%, -50%)
+        rotateX(calc(var(--i) * 22.5deg))
+        translateZ(120px);
+}
+
+.box-3d span i{
+    font-style:normal;
+}
+
+.box-3d span i:first-child{
+    color:#ffffff;
+}
+
+.box-3d span i:last-child{
+    color:#999999;
+}
+
+@keyframes spinText{
+    0%{
+        transform:perspective(1000px) rotateX(0deg) rotateZ(5deg);
+    }
+
+    100%{
+        transform:perspective(1000px) rotateX(360deg) rotateZ(5deg);
+    }
+}
