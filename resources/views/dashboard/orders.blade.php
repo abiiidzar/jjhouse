@@ -3,12 +3,16 @@
 @section('title', 'My Orders - JJHOUSE')
 
 @section('content')
-<div data-theme="light" class="container mx-auto px-4 py-12 ">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<div data-theme="light" class="container mx-auto px-4 pt-24 pb-8 md:pt-28 md:pb-12">
+    <div data-sidebar-layout data-customer-sidebar-layout data-sidebar-key="customer-dashboard" data-sidebar-desktop-breakpoint="1024" data-sidebar-lock-scroll class="relative flex flex-col items-start lg:flex-row">
+        <div data-sidebar-overlay aria-hidden="true"></div>
         @include('dashboard.sidebar')
 
-        <div class="lg:col-span-3">
-            <h1 class="text-2xl font-bold mb-6">My Orders</h1>
+        <div class="w-full min-w-0 flex-1 lg:w-auto">
+            <div class="mb-6 flex items-center gap-3">
+                <x-dashboard-sidebar-toggle />
+                <h1 class="text-2xl font-bold">My Orders</h1>
+            </div>
 
             @if($orders->count() > 0)
                 <div class="space-y-4">
@@ -25,7 +29,7 @@
                             </div>
                             <div>
                                 <span class="text-sm text-gray-500">Total</span>
-                                <span class="font-semibold ml-2">Rp {{ number_format($order->total_amount + $order->shipping_cost, 0, ',', '.') }}</span>
+                                <span class="font-semibold ml-2">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
                             </div>
                             <div>
                                 <span class="px-3 py-1 text-xs rounded-full
@@ -46,7 +50,14 @@
                             <div class="flex gap-4 overflow-x-auto">
                                 @foreach($order->items->take(3) as $item)
                                 <div class="flex items-center gap-3 bg-gray-50 px-3 py-2 rounded-lg">
-                                    <div class="w-12 h-12 bg-gray-200 rounded"></div>
+                                    <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                                        @if($item->product->primaryImage)
+                                            <img src="{{ $item->product->primaryImage->image_path }}"
+                                                 class="w-full h-full object-cover">
+                                        @else
+                                            <div class="w-full h-full bg-gray-100"></div>
+                                        @endif
+                                    </div>
                                     <div>
                                         <p class="text-sm font-medium">{{ $item->product->name }}</p>
                                         <p class="text-xs text-gray-500">Qty: {{ $item->quantity }}</p>

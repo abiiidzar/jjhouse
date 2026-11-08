@@ -67,8 +67,8 @@ class CartPage extends Component
     {
         if ($this->selectedCity && $this->selectedCourier) {
             $rajaOngkir = new RajaOngkirService();
-            // Assuming origin is Jakarta Selatan (city id 152)
-            $origin = 152;
+            // Assuming origin is Bukittinggi (city id 495)
+            $origin = 495;
             $weight = $this->getTotalWeight();
             $costs = $rajaOngkir->calculateCost($origin, $this->selectedCity, $weight, $this->selectedCourier);
             if (!empty($costs)) {

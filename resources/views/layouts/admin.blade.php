@@ -353,6 +353,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
+                        <x-notification-bell />
                         <a href="{{ route('home') }}" target="_blank" class="text-sm text-gray-600 hover:text-black transition">View Store →</a>
                     </div>
                 </div>

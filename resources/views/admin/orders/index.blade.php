@@ -66,7 +66,7 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 text-sm font-mono">{{ $order->order_number }}</td>
                         <td class="px-6 py-4 text-sm">{{ $order->user->name }}<br><span class="text-xs text-gray-400">{{ $order->user->email }}</span></td>
-                        <td class="px-6 py-4 text-sm font-semibold">Rp {{ number_format($order->total_amount + $order->shipping_cost, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 text-sm font-semibold">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs rounded-full
                                 @if($order->payment_status == 'paid') bg-green-100 text-green-800

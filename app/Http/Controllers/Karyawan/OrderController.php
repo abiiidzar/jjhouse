@@ -37,10 +37,20 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,processing,ready_to_ship,shipped,delivered,cancelled',
+            'tracking_number' => 'nullable|string|max:255',
+            'shipping_note' => 'nullable|string|max:2000',
         ]);
 
         $oldStatus = $order->status;
-        $order->update(['status' => $validated['status']]);
+        $updates = ['status' => $validated['status']];
+
+        foreach (['tracking_number', 'shipping_note'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $updates[$field] = $validated[$field];
+            }
+        }
+
+        $order->update($updates);
 
         return redirect()->route('karyawan.orders.show', $order)
             ->with('success', "Status pesanan diubah dari {$oldStatus} menjadi {$validated['status']}");

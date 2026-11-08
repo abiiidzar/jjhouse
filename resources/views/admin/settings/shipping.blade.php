@@ -71,7 +71,7 @@
                 <input
                     type="number"
                     name="default_origin_city"
-                    value="{{ cache('shipping_default_origin_city') ?? 152 }}"
+                    value="{{ cache('shipping_default_origin_city') ?? 495 }}"
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
                            focus:ring-2 focus:ring-black focus:outline-none
                            @error('default_origin_city') border-red-500 @enderror"
@@ -83,7 +83,7 @@
                 @enderror
 
                 <p class="text-xs text-gray-400 mt-1">
-                    Default: 152 (Jakarta Selatan)
+                    Default: 495 (Bukittinggi)
                 </p>
             </div>
 

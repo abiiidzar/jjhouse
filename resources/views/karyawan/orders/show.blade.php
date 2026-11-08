@@ -34,6 +34,16 @@
                 <p class="text-sm text-gray-600">
                     Ongkir: <strong>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</strong>
                 </p>
+                @if ($order->tracking_number)
+                <p class="text-sm text-gray-600 mt-2">
+                    Nomor resi: <strong>{{ $order->tracking_number }}</strong>
+                </p>
+                @endif
+                @if ($order->shipping_note)
+                <p class="text-sm text-gray-600 mt-1">
+                    Catatan pengiriman: {{ $order->shipping_note }}
+                </p>
+                @endif
             </div>
 
             <!-- Order Status -->
@@ -142,10 +152,22 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Catatan (Opsional)</label>
-                <textarea name="notes" id="notes" rows="2" placeholder="Catatan untuk pesanan ini..."
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label for="tracking_number" class="mb-2 block text-sm font-medium text-gray-700">Nomor resi <span class="font-normal text-gray-500">(opsional)</span></label>
+                    <input name="tracking_number" id="tracking_number" type="text" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="Contoh: JNE123456789" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    @error('tracking_number')
+                    <span class="text-sm text-red-600">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="shipping_note" class="mb-2 block text-sm font-medium text-gray-700">Catatan pengiriman <span class="font-normal text-gray-500">(opsional)</span></label>
+                    <input name="shipping_note" id="shipping_note" type="text" value="{{ old('shipping_note', $order->shipping_note) }}" placeholder="Contoh: Paket sudah diserahkan ke kurir" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    @error('shipping_note')
+                    <span class="text-sm text-red-600">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
 
             <div class="flex gap-3">

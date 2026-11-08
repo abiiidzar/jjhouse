@@ -17,8 +17,11 @@ class Order extends Model
         'status',
         'payment_status',
         'payment_method',
+        'paid_amount',
         'shipping_courier',
         'shipping_service',
+        'tracking_number',
+        'shipping_note',
         'shipping_address',
         'province',
         'city',
@@ -31,6 +34,7 @@ class Order extends Model
     protected $casts = [
         'total_amount' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -40,13 +44,16 @@ class Order extends Model
         'pending' => 'Menunggu Pembayaran',
         'paid' => 'Dibayar',
         'processing' => 'Diproses',
+        'ready_to_ship' => 'Siap Dikirim',
         'shipped' => 'Dikirim',
+        'delivered' => 'Diterima',
         'completed' => 'Selesai',
         'cancelled' => 'Dibatalkan',
     ];
 
     const PAYMENT_STATUSES = [
         'unpaid' => 'Belum Dibayar',
+        'pending' => 'Menunggu Pembayaran',
         'dp' => 'DP 50%',
         'paid' => 'Lunas',
         'refunded' => 'Dikembalikan',
@@ -89,7 +96,9 @@ class Order extends Model
             'pending' => 'yellow',
             'paid' => 'blue',
             'processing' => 'indigo',
+            'ready_to_ship' => 'teal',
             'shipped' => 'purple',
+            'delivered' => 'green',
             'completed' => 'green',
             'cancelled' => 'red',
         ];

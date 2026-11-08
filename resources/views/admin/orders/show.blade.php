@@ -14,16 +14,36 @@
                 <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
                 <option value="paid" {{ $order->status == 'paid' ? 'selected' : '' }}>Paid</option>
                 <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
+                <option value="ready_to_ship" {{ $order->status == 'ready_to_ship' ? 'selected' : '' }}>Ready to Ship</option>
                 <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
                 <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Completed</option>
                 <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
             </select>
             <select name="payment_status" class="border border-gray-300 rounded-md px-3 py-2">
                 <option value="unpaid" {{ $order->payment_status == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
+                <option value="pending" {{ $order->payment_status == 'pending' ? 'selected' : '' }}>Pending</option>
                 <option value="dp" {{ $order->payment_status == 'dp' ? 'selected' : '' }}>DP</option>
                 <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>Paid</option>
                 <option value="refunded" {{ $order->payment_status == 'refunded' ? 'selected' : '' }}>Refunded</option>
+                <option value="failed" {{ $order->payment_status == 'failed' ? 'selected' : '' }}>Failed</option>
             </select>
+            <div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label for="tracking_number" class="mb-1 block text-sm font-medium text-gray-700">Nomor resi <span class="font-normal text-gray-500">(opsional)</span></label>
+                    <input id="tracking_number" name="tracking_number" type="text" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="Contoh: JNE123456789" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900">
+                    @error('tracking_number')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="shipping_note" class="mb-1 block text-sm font-medium text-gray-700">Catatan pengiriman <span class="font-normal text-gray-500">(opsional)</span></label>
+                    <input id="shipping_note" name="shipping_note" type="text" value="{{ old('shipping_note', $order->shipping_note) }}" placeholder="Contoh: Paket sudah diserahkan ke kurir" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900">
+                    @error('shipping_note')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
             <button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800">Update Status</button>
         </form>
     </div>
@@ -64,7 +84,7 @@
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between"><span>Subtotal</span><span>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span></div>
                     <div class="flex justify-between"><span>Shipping</span><span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span></div>
-                    <div class="border-t pt-2 font-semibold flex justify-between"><span>Total</span><span>Rp {{ number_format($order->total_amount + $order->shipping_cost, 0, ',', '.') }}</span></div>
+                    <div class="border-t pt-2 font-semibold flex justify-between"><span>Total</span><span>Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span></div>
                 </div>
             </div>
 
@@ -78,6 +98,12 @@
                     <p class="text-sm text-gray-600">{{ $order->shipping_address }}</p>
                     <p class="text-sm text-gray-600">{{ $order->city }}, {{ $order->province }}</p>
                     <p class="text-sm text-gray-600">Courier: {{ strtoupper($order->shipping_courier) }}</p>
+                    @if ($order->tracking_number)
+                        <p class="mt-1 text-sm text-gray-600">Nomor resi: <span class="font-medium text-gray-800">{{ $order->tracking_number }}</span></p>
+                    @endif
+                    @if ($order->shipping_note)
+                        <p class="mt-1 text-sm text-gray-600">Catatan pengiriman: {{ $order->shipping_note }}</p>
+                    @endif
                 </div>
             </div>
 

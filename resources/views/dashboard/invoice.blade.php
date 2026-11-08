@@ -89,12 +89,12 @@
 
             <div class="flex justify-between mb-2 text-gray-400">
                 <span>Shipping</span>
-                <span>-</span>
+                <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
             </div>
 
             <div class="flex justify-between border-t pt-4 font-medium text-base">
                 <span>Total</span>
-                <span>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                <span>Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
             </div>
 
         </div>

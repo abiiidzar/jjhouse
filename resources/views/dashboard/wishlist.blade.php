@@ -3,12 +3,16 @@
 @section('title', 'My Wishlist - JJHOUSE')
 
 @section('content')
-<div class="container mx-auto px-4 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<div data-theme="light" class="container mx-auto px-4 pt-24 pb-8 md:pt-28 md:pb-12">
+    <div data-sidebar-layout data-customer-sidebar-layout data-sidebar-key="customer-dashboard" data-sidebar-desktop-breakpoint="1024" data-sidebar-lock-scroll class="relative flex flex-col items-start lg:flex-row">
+        <div data-sidebar-overlay aria-hidden="true"></div>
         @include('dashboard.sidebar')
 
-        <div class="lg:col-span-3">
-            <h1 class="text-2xl font-bold mb-6">My Wishlist</h1>
+        <div class="w-full min-w-0 flex-1 lg:w-auto">
+            <div class="mb-6 flex items-center gap-3">
+                <x-dashboard-sidebar-toggle />
+                <h1 class="text-2xl font-bold">My Wishlist</h1>
+            </div>
 
             @php
                 $wishlists = auth()->user()->wishlists()->with('product.primaryImage')->get();

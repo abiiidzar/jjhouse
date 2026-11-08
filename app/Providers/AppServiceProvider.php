@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         ProductSize::observe(ProductSizeObserver::class);
+        Order::observe(OrderObserver::class);
     }
     public function saved(ProductSize $productSize)
 {

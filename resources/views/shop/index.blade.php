@@ -5,61 +5,69 @@
 @section('content')
 
 <!-- ================= HERO / HEADER ================= -->
-<section data-theme="light" class="bg-white px-10 py-20 text-center uppercase tracking-widest">
-    <h1 class="text-4xl md:text-6xl font-semibold tracking-tight">
+<section data-theme="light" class="bg-white px-5 sm:px-10 py-12 sm:py-20 text-center uppercase tracking-widest">
+    <h1 class="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-tight">
         SHOP
     </h1>
-    <p class="text-neutral-500 mt-3 text-sm tracking-widest uppercase">
+    <p class="text-neutral-500 mt-2 sm:mt-3 text-xs sm:text-sm tracking-widest uppercase">
         Explore Our Collection
     </p>
 </section>
 
-
 <!-- ================= FILTER BAR ================= -->
-<section data-theme="light" class="bg-white px-10 pb-10">
-    <div class="flex flex-wrap items-center justify-between gap-4 text-sm">
+<section data-theme="light" class="bg-white px-3 sm:px-10 pb-6 sm:pb-10">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm">
 
-        <!-- LEFT -->
-        <div class="flex gap-6 uppercase tracking-widest text-neutral-500">
-            <a href="{{ route('shop') }}" class="hover:text-black relative inline-block text-l tracking-widest uppercase pb-1
-              after:content-[''] after:absolute after:left-0 after:bottom-0
-              after:w-full after:h-[0.5px] after:bg-black
-              after:scale-x-0 after:origin-left
-              after:transition-transform after:duration-300
-              hover:after:scale-x-100 {{ request('category') ? 'text-black' : '' }}">All</a>
-
-            @foreach($categories ?? [] as $category)
-                <a href="{{ route('shop', ['category' => $category->slug]) }}"
-                   class="hover:text-black relative inline-block text-l tracking-widest uppercase pb-1
-              after:content-[''] after:absolute after:left-0 after:bottom-0
-              after:w-full after:h-[0.5px] after:bg-black
-              after:scale-x-0 after:origin-left
-              after:transition-transform after:duration-300
-              hover:after:scale-x-100 {{ request('category') == $category->slug ? 'text-black' : '' }}">
-                    {{ $category->name }}
+        <!-- LEFT - Categories (Scroll horizontal di mobile) -->
+        <div class="w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+            <div class="flex gap-3 sm:gap-6 uppercase tracking-widest text-neutral-500 whitespace-nowrap min-w-max">
+                <a href="{{ route('shop') }}"
+                   class="hover:text-black relative inline-block text-xs sm:text-l tracking-widest uppercase pb-1
+                          after:content-[''] after:absolute after:left-0 after:bottom-0
+                          after:w-full after:h-[0.5px] after:bg-black
+                          after:scale-x-0 after:origin-left
+                          after:transition-transform after:duration-300
+                          hover:after:scale-x-100 {{ !request('category') ? 'text-black' : '' }}">
+                    All
                 </a>
-            @endforeach
+
+                @foreach($categories ?? [] as $category)
+                    <a href="{{ route('shop', ['category' => $category->slug]) }}"
+                       class="hover:text-black relative inline-block text-xs sm:text-l tracking-widest uppercase pb-1
+                              after:content-[''] after:absolute after:left-0 after:bottom-0
+                              after:w-full after:h-[0.5px] after:bg-black
+                              after:scale-x-0 after:origin-left
+                              after:transition-transform after:duration-300
+                              hover:after:scale-x-100 {{ request('category') == $category->slug ? 'text-black' : '' }}">
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
         </div>
 
-        <!-- RIGHT -->
-        <form method="GET">
-            <select name="sort"
-                    onchange="this.form.submit()"
-                    class="border-none bg-white text-black focus:outline-none uppercase tracking-widest">
-                <option value="latest">Latest</option>
-                <option value="price_asc">Price ↑</option>
-                <option value="price_desc">Price ↓</option>
-            </select>
-        </form>
+        <!-- RIGHT - Sort -->
+        <div class="w-full sm:w-auto">
+            <form method="GET" class="w-full">
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                <select name="sort"
+                        onchange="this.form.submit()"
+                        class="w-full sm:w-auto border border-gray-200 rounded-md bg-white text-black focus:outline-none focus:ring-1 focus:ring-black uppercase tracking-widest text-xs sm:text-sm px-3 py-2 appearance-none">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
+                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price ↑</option>
+                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price ↓</option>
+                </select>
+            </form>
+        </div>
 
     </div>
 </section>
 
-
 <!-- ================= PRODUCTS ================= -->
-<section data-theme="light" class="bg-white px-10 pb-32">
+<section data-theme="light" class="bg-white px-3 sm:px-10 pb-16 sm:pb-32">
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-10">
 
         @forelse($products as $product)
 
@@ -70,21 +78,20 @@
 
                 @if($product->primaryImage)
                     <img src="{{ $product->primaryImage->image_path }}"
-                         class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
+                         class="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                         loading="lazy">
                 @else
                     <div class="w-full h-full flex items-center justify-center text-gray-300 text-3xl">
-                        <span>
-                            <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-30 h-30 object-cover transition duration-700 group-hover:scale-105">
-                        </span>
+                        <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-16 sm:w-20 md:w-30 h-16 sm:h-20 md:h-30 object-cover transition duration-700 group-hover:scale-105">
                     </div>
                 @endif
 
             </div>
 
             <!-- INFO -->
-            <div class="mt-3 text-sm">
+            <div class="mt-2 sm:mt-3 text-xs sm:text-sm">
 
-                <p class="group-hover:opacity-70 transition">
+                <p class="group-hover:opacity-70 transition line-clamp-2">
                     {{ $product->name }}
                 </p>
 
@@ -108,13 +115,19 @@
 
 </section>
 
-
+<!-- ================= PAGINATION ================= -->
 <!-- ================= PAGINATION ================= -->
 @if($products->hasPages())
-<section data-theme="light" class="bg-white pb-20 text-center">
-    {{ $products->links('vendor.pagination.tailwind') }}
+<section data-theme="light" class="bg-white pb-10 sm:pb-20 text-center px-3 sm:px-0">
+    {{ $products->appends(request()->query())->links('vendor.pagination.tailwind') }}
 </section>
 @endif
 
 <span id="slideNum" class="hidden">01</span>
+
+<!-- ================= HIDDEN INPUTS UNTUK FILTER ================= -->
+@if(request('sort') && request('sort') != 'latest')
+    <div class="hidden" id="selected-sort" data-sort="{{ request('sort') }}"></div>
+@endif
+
 @endsection

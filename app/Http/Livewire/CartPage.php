@@ -20,7 +20,7 @@ class CartPage extends Component
     public $shippingCost = 0;
     public $couriers = ['jne', 'tiki', 'pos'];
     public $selectedCourier = 'jne';
-    public $originCity = 152; // Jakarta Selatan
+    public $originCity = 495; // Jakarta Selatan
 
     protected $listeners = ['cartUpdated' => 'loadCart'];
 
@@ -77,8 +77,14 @@ class CartPage extends Component
             $rajaOngkir = new RajaOngkirService();
             $weight = $this->getTotalWeight();
             $costs = $rajaOngkir->calculateCost($this->originCity, $this->selectedCity, $weight, $this->selectedCourier);
+
             if (!empty($costs)) {
-                $this->shippingCost = $costs[0]['cost'][0]['value'];
+                // Ambil harga termurah
+                $cheapestCost = $costs[0]['cost'][0]['value'] ?? 0;
+                $this->shippingCost = $cheapestCost;
+            } else {
+                $this->shippingCost = 0;
+                session()->flash('shipping_error', 'Gagal menghitung ongkos kirim. Silakan coba lagi.');
             }
         }
     }

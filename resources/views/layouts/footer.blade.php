@@ -100,7 +100,7 @@
 
         <!-- Bottom Bar -->
         <div class="border-t border-white/10 mt-12 pt-8 text-center text-gray-500 text-xs">
-            <p>&copy; {{ date('Y') }} JJHOUSE. All rights reserved. Designed in Jakarta.</p>
+            <p>&copy; {{ date('Y') }} JJHOUSE. All rights reserved. Designed in Bukittinggi.</p>
         </div>
     </div>
 </footer>

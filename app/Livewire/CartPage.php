@@ -20,7 +20,7 @@ class CartPage extends Component
     public $shippingCost = 0;
     public $couriers = ['jne', 'tiki', 'pos'];
     public $selectedCourier = 'jne';
-    public $originCity = 152; // Jakarta Selatan
+    public $originCity = 495; // Jakarta Selatan
 
     protected $listeners = ['cartUpdated' => 'loadCart'];
 

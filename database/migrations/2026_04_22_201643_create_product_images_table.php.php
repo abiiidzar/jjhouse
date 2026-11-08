@@ -1,4 +1,3 @@
-// database/migrations/2025_01_01_000005_create_product_images_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;

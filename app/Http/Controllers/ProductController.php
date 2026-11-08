@@ -4,32 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    // Di ShopController atau controller produk Anda
+    public function index(Request $request)
     {
-        $query = Product::where('is_active', '=', true)->with('primaryImage');
+        $query = Product::query();
 
-        // FILTER CATEGORY
-        if (request('category')) {
-            $query->whereHas('category', function ($q) {
-                $q->where('slug', '=', request('category'));
+        // Filter kategori
+        if ($request->has('category') && $request->category != '') {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('slug', $request->category);
             });
         }
 
-        // SORTING
-        if (request('sort') == 'price_asc') {
-            $query->orderBy('price', 'asc');
-        } elseif (request('sort') == 'price_desc') {
-            $query->orderBy('price', 'desc');
-        } else {
-            $query->latest();
+        // Sort
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
         }
 
         $products = $query->paginate(12);
-
-        // optional (buat filter UI)
         $categories = Category::all();
 
         return view('shop.index', compact('products', 'categories'));

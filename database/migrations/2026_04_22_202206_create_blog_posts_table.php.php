@@ -1,4 +1,3 @@
-// database/migrations/2025_01_01_000010_create_blog_posts_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;

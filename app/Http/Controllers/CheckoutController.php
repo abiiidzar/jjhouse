@@ -12,6 +12,9 @@ use Midtrans\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderStatusMail;
+use App\Http\Controllers\LogController;
+use Illuminate\Support\Facades\Log;
+
 
 
 class CheckoutController extends Controller
@@ -24,10 +27,10 @@ class CheckoutController extends Controller
         }
 
         $subtotal = 0;
-        $preorderItems = [];
-        $regularItems = [];
-
-        foreach ($cart->items as $item) {
+        $preorderItems = collect();
+        $regularItems = collect();
+        $cartItems = $cart->items()->with('product.primaryImage', 'size')->get();
+        foreach ($cartItems as $item) {
             $subtotal += $item->product->price * $item->quantity;
             if ($item->is_preorder) {
                 $preorderItems[] = $item;
@@ -36,11 +39,10 @@ class CheckoutController extends Controller
             }
         }
 
-        $shippingData = session()->get('checkout');
+        $shippingData = session()->get('checkout', []);
         $shippingCost = $shippingData['shipping_cost'] ?? 0;
         $discount = session('applied_discount.discount_amount', 0);
         $total = $subtotal + $shippingCost - $discount;
-        $cartItems = $cart->items;
 
         // Get store settings from cache
         $storeInfo = [
@@ -53,7 +55,9 @@ class CheckoutController extends Controller
         // Get user profile data
         $user = Auth::user();
 
-        return view('checkout.index', compact('cart', 'cartItems', 'shippingData', 'subtotal', 'discount', 'total', 'shippingCost', 'preorderItems', 'regularItems', 'storeInfo', 'user'));
+        return view('checkout.index', compact('cart', 'cartItems', 'shippingData', 
+        'subtotal', 'discount', 'total', 'shippingCost', 'preorderItems', 
+        'regularItems', 'storeInfo', 'user'));
     }
 
     public function process(Request $request)
@@ -63,16 +67,18 @@ class CheckoutController extends Controller
             'name' => 'nullable|string',
             'shipping_address' => 'required|string',
             'phone' => 'required|string',
-            'payment_method' => 'required|in:midtrans,bank_transfer',
+            'payment_method' => 'required|in:midtrans,bank_transfer,gopay',
             'postal_code' => 'nullable|string',
             'province' => 'nullable|string',
-            'city' => 'nullable|string',
+            'city' => 'nullable|string',           
+            'shipping_courier' => 'nullable|string',
+            'shipping_cost' => 'nullable|numeric',
             'preorder_payment_type' => 'nullable|in:full,dp',
         ]);
 
         $user = Auth::user();
         $cart = $user->cart;
-
+    
         // 2. Ambil data shipping dari session (diisi oleh Livewire)
         $shippingData = session()->get('checkout', []);
 
@@ -84,11 +90,12 @@ class CheckoutController extends Controller
 
         // 3. Update info user (Menyimpan alamat terakhir yang digunakan ke profile)
         $updateData = [
+            'name' => $request->name,
             'phone' => $request->phone,
             'address' => $request->shipping_address,
-            'city' => $finalCity,
-            'province' => $finalProvince,
-            'postal_code' => $finalPostal,
+            'city' => $shippingData['city'] ?? null,
+            'province' => $shippingData['province'] ?? null,
+            'postal_code' => $shippingData['postal_code'] ?? null,
         ];
 
         if ($request->name) {
@@ -104,22 +111,22 @@ class CheckoutController extends Controller
         }
 
         $shippingCost = $shippingData['shipping_cost'] ?? 0;
-        $totalAmount = $subtotal + $shippingCost;
-
+        // $totalAmount = $subtotal + $shippingCost;
+        $totalAmount = $subtotal;
         // 5. Create Order
         $order = Order::create([
             'user_id' => $user->id,
-            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'order_number' => 'JJY-' . date('Ymd') . '-' . strtoupper(uniqid()),
             'total_amount' => $totalAmount,
             'shipping_cost' => $shippingCost,
             'status' => 'pending',
             'payment_status' => 'unpaid',
             'payment_method' => $request->payment_method,
-            'shipping_courier' => ($shippingData['courier'] ?? null) . ' ' . ($shippingData['service'] ?? ''),
+            'shipping_courier' => $shippingData['courier'] ?? null,
             'shipping_address' => $request->shipping_address,
-            'province' => $finalProvince,
-            'city' => $finalCity,
-            'postal_code' => $finalPostal,
+            'province' => $shippingData['province'] ?? null,
+            'city' => $shippingData['city'] ?? null,
+            'postal_code' => $shippingData['postal_code'] ?? null,
         ]);
 
         // 6. Create Order Items & Manage Stock
@@ -165,12 +172,17 @@ class CheckoutController extends Controller
         session()->forget('checkout');
 
         // 8. Pembayaran Midtrans
-        if ($request->payment_method == 'midtrans') {
+        // 🔥 PROSES PEMBAYARAN DENGAN MIDTRANS
+        if (in_array($request->payment_method, ['midtrans', 'bank_transfer', 'gopay'])) {
             $midtrans = new MidtransService();
+            
+            // Prepare items for Midtrans
             $items = [];
-
             foreach ($order->items as $item) {
-                $price = $item->preorder_payment_type == 'dp' ? $item->down_payment_amount / $item->quantity : $item->price;
+                $price = $item->preorder_payment_type == 'dp' 
+                    ? $item->down_payment_amount / $item->quantity 
+                    : $item->price;
+                
                 $items[] = [
                     'id' => (string) $item->product_id,
                     'price' => (int) $price,
@@ -178,13 +190,16 @@ class CheckoutController extends Controller
                     'name' => $item->product->name,
                 ];
             }
-
-            $items[] = [
-                'id' => 'shipping',
-                'price' => (int) $order->shipping_cost,
-                'quantity' => 1,
-                'name' => 'Ongkos Kirim',
-            ];
+            
+            // Tambahkan shipping sebagai item
+            if ($order->shipping_cost > 0) {
+                $items[] = [
+                    'id' => 'shipping',
+                    'price' => (int) $order->shipping_cost,
+                    'quantity' => 1,
+                    'name' => 'Ongkos Kirim',
+                ];
+            }
 
             $customerDetails = [
                 'first_name' => $user->name,
@@ -192,59 +207,109 @@ class CheckoutController extends Controller
                 'phone' => $user->phone,
             ];
 
+            // 🔥 Dapatkan Snap Token dari Midtrans
             $snapToken = $midtrans->createTransaction($order, $items, $customerDetails);
 
             if ($snapToken) {
-                return view('payment', compact('snapToken', 'order'));
+                // 🔥 Arahkan ke halaman payment dengan Snap Token
+                return view('payment.index', compact('snapToken', 'order'));
+            } else {
+                // Jika Midtrans gagal, tetap simpan order
+                Log::error('Midtrans transaction failed for order: ' . $order->order_number);
+                return redirect()->route('dashboard')
+                    ->with('warning', 'Pesanan berhasil dibuat, namun pembayaran gagal diproses. Silakan coba lagi.');
             }
         }
 
         return redirect()->route('dashboard')->with('success', 'Pesanan berhasil dibuat. Silakan lakukan pembayaran.');
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request, MidtransService $midtrans)
     {
+         Log::info('Midtrans Callback Received:', [
+            'method' => $request->method(),
+            'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            'raw' => file_get_contents('php://input')
+        ]);
         try {
-            $midtrans = new MidtransService();
-            $notification = new Notification();
+            $result = $midtrans->handleNotification();
 
-            $orderNumber = $notification->order_id;
-            $transactionStatus = $notification->transaction_status;
-            $fraudStatus = $notification->fraud_status;
-            $paymentType = $notification->payment_type;
+            if (!$result) {
+                \Log::error('Invalid Midtrans notification received');
+                return response()->json(['message' => 'Invalid notification'], 400);
+            }
 
-            $order = Order::where('order_number', $orderNumber)->first();
-
+            $order = Order::where('order_number', $result['order_id'])
+                ->orWhere('order_number', 'like', $result['order_id'] . '%')
+                ->first();
             if (!$order) {
+                \Log::error('Order not found for notification', ['order_id' => $result['order_id']]);
                 return response()->json(['message' => 'Order not found'], 404);
             }
 
-            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-                if ($fraudStatus == 'accept') {
-                    $order->update([
-                        'payment_status' => 'paid',
-                        'status' => 'processing',
-                    ]);
-                    Mail::to($order->user->email)
-                        ->subject('Pembayaran Berhasil')
-                        ->queue(new OrderStatusMail($order));
+             Log::info('Order found for callback:', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'current_status' => $order->status,
+                'current_payment_status' => $order->payment_status,
+            ]);
+
+            // Verify signature for security
+            $isValid = $midtrans->verifySignature(
+                $result['order_id'],
+                $result['status_code'],
+                $result['gross_amount'],
+                $result['signature_key'] ?? ''
+            );
+
+            if (!$isValid) {
+                \Log::error('Invalid signature for order', ['order_id' => $result['order_id']]);
+                return response()->json(['message' => 'Invalid signature'], 401);
+            }
+
+            
+            $transactionStatus = $result['transaction_status'];
+            $fraudStatus = $result['fraud_status'];
+
+            Log::info('Processing transaction status:', [
+                'transaction_status' => $transactionStatus,
+                'fraud_status' => $fraudStatus,
+            ]);
+            // Update order status based on transaction
+            if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $fraudStatus == 'accept')) {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'status' => 'processing',
+                ]);
+                Log::info('Order marked as PAID', ['order_id' => $order->id]);
+
+                // Update stock
+                foreach ($order->items as $item) {
+                    if ($item->size) {
+                        $item->size->decreaseStock($item->quantity);
+                    }
                 }
+
+                \Log::info('Order paid successfully', ['order_id' => $order->id]);
             } elseif ($transactionStatus == 'pending') {
                 $order->update([
                     'payment_status' => 'pending',
                     'status' => 'pending',
                 ]);
+                \Log::info('Order pending payment', ['order_id' => $order->id]);
             } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
                 $order->update([
                     'status' => 'cancelled',
                     'payment_status' => 'failed',
                 ]);
+                \Log::info('Order cancelled/failed', ['order_id' => $order->id]);
             }
 
             return response()->json(['message' => 'OK']);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Midtrans Callback Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Error'], 500);
+            \Log::error('Payment callback error: ' . $e->getMessage());
+            return response()->json(['message' => 'Error processing callback'], 500);
         }
     }
 

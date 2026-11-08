@@ -1,4 +1,3 @@
-// database/migrations/2025_01_01_000006_create_carts_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;

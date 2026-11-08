@@ -83,7 +83,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Grafik Penjualan 6 Bulan Terakhir</h3>
                 <p class="text-xs text-gray-500 mt-1">Tren pendapatan total</p>
             </div>
-            <canvas id="salesChart" height="300"></canvas>
+            <canvas id="salesChart" height="100"></canvas>
         </div>
 
         <!-- Profit Chart -->
@@ -92,7 +92,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Grafik Keuntungan 6 Bulan Terakhir</h3>
                 <p class="text-xs text-gray-500 mt-1">Keuntungan bersih (Penjualan - HPP)</p>
             </div>
-            <canvas id="profitChart" height="300"></canvas>
+            <canvas id="profitChart" height="100"></canvas>
         </div>
     </div>
 
@@ -104,7 +104,7 @@
                 <h3 class="text-lg font-semibold text-gray-800">Produk Terlaris</h3>
                 <p class="text-xs text-gray-500 mt-1">Top 5 produk paling banyak terjual</p>
             </div>
-            <canvas id="productsChart" height="250"></canvas>
+            <canvas id="productsChart" height="150"></canvas>
         </div>
 
         <!-- Key Metrics -->

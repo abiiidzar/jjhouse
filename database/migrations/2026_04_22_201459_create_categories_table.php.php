@@ -1,4 +1,3 @@
-// database/migrations/2025_01_01_000002_create_categories_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;

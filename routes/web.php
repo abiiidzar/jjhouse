@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -39,9 +40,10 @@ Route::get('/login', [LoginController::class, 'index'])
 
 Route::post('/login', [LoginController::class, 'store'])
     ->middleware('guest');
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register')->middleware('guest');
+
+Route::get('/register', [RegisterController::class, 'index'])
+    ->name('register')
+    ->middleware('guest');
 Route::post('/register', [RegisterController::class, 'store'])->middleware('guest');
 
 
@@ -69,11 +71,23 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [OrderController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/orders/{order}', [OrderController::class, 'show'])->name('dashboard.order');
-    Route::get('/dashboard/wishlist', function () {
-        return view('dashboard.wishlist');
-    })->name('dashboard.wishlist');
+    Route::get('/dashboard/wishlist', function () {return view('dashboard.wishlist');})->name('dashboard.wishlist');
     Route::get('/dashboard/invoice/{order}', [OrderController::class, 'invoice'])->name('dashboard.invoice');
 
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
+        Route::patch('/read-all', [NotificationController::class, 'readAll'])->name('read-all');
+        Route::patch('/{notification}/read', [NotificationController::class, 'read'])->name('read');
+    });
+
+    Route::put('/dashboard/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('order.cancel');
+    
+    // 🔥 RETRY PAYMENT - Baru
+    Route::post('/dashboard/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('order.retry-payment');
+    
+    // 🔥 Complete pre-order payment
+    Route::get('/dashboard/orders/{order}/complete-payment/{item}', [OrderController::class, 'completePayment'])->name('order.complete-payment');
     Route::get('/dashboard/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/dashboard/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/dashboard/password', [ProfileController::class, 'updatePassword'])->name('dashboard.password.update');
@@ -252,3 +266,52 @@ Route::prefix('kasir')->middleware(['auth', 'role:kasir'])->name('kasir.')->grou
     Route::get('history', \App\Http\Controllers\Kasir\OrderController::class . '@history')->name('history');
 
 });
+Route::post('/payment-callback', [App\Http\Controllers\CheckoutController::class, 'callback'])
+    ->name('payment.callback');
+// routes/web.php
+Route::get('/test-rajaongkir', function () {
+    $service = new App\Services\RajaOngkirService();
+    return response()->json($service->testConnection());
+})->middleware('auth');
+Route::get('/test/midtrans', function () {
+    $midtrans = new App\Services\MidtransService();
+
+    try {
+        $midtrans->createTransaction(
+            (object) ['order_number' => 'TEST-123', 'total_amount' => 10000],
+            [['id' => 'test', 'price' => 10000, 'quantity' => 1, 'name' => 'Test Product']],
+            ['first_name' => 'Test', 'email' => 'test@example.com']
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Midtrans configured correctly'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+});
+// routes/web.php
+
+// 🔥 Route untuk test callback manual (hanya untuk development)
+Route::post('/test-callback', function (Illuminate\Http\Request $request) {
+    Log::info('Test Callback Received:', $request->all());
+    
+    // Simulasikan pembayaran berhasil
+    $orderNumber = $request->order_id ?? 'ORD-20260809-ABC123';
+    $order = App\Models\Order::where('order_number', $orderNumber)->first();
+    
+    if ($order) {
+        $order->update([
+            'payment_status' => 'paid',
+            'status' => 'processing'
+        ]);
+        Log::info('Test callback: Order updated', ['order_id' => $order->id]);
+        return response()->json(['message' => 'Order updated successfully']);
+    }
+    
+    return response()->json(['message' => 'Order not found'], 404);
+})->name('test.callback');

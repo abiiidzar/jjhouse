@@ -173,12 +173,14 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
 
                     <!-- SEARCH -->
                     <input type="text"
                            placeholder="Cari produk..."
                            class="px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-black">
+
+                    <x-notification-bell />
 
                 </div>
 

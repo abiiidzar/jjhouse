@@ -1,4 +1,3 @@
-// database/migrations/2025_01_01_000008_create_wishlists_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;

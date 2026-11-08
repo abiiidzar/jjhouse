@@ -50,15 +50,25 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order)
     {
-        $request->validate([
-            'status' => 'required|in:pending,paid,processing,shipped,completed,cancelled',
-            'payment_status' => 'required|in:unpaid,dp,paid,refunded',
+        $validated = $request->validate([
+            'status' => 'required|in:'.implode(',', array_keys(Order::STATUSES)),
+            'payment_status' => 'required|in:'.implode(',', array_keys(Order::PAYMENT_STATUSES)),
+            'tracking_number' => 'nullable|string|max:255',
+            'shipping_note' => 'nullable|string|max:2000',
         ]);
 
-        $order->update([
-            'status' => $request->status,
-            'payment_status' => $request->payment_status,
-        ]);
+        $updates = [
+            'status' => $validated['status'],
+            'payment_status' => $validated['payment_status'],
+        ];
+
+        foreach (['tracking_number', 'shipping_note'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $updates[$field] = $validated[$field];
+            }
+        }
+
+        $order->update($updates);
 
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }

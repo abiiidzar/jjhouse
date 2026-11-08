@@ -1,24 +1,27 @@
-<div data-inline-sidebar data-sidebar-key="customer-dashboard" class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 sticky top-24">
-    <div class="flex items-center justify-between gap-3 mb-6">
-        <h2 class="font-semibold text-gray-800">Menu Akun</h2>
-        <button type="button" data-inline-sidebar-toggle class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition" aria-label="Toggle sidebar">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+<aside id="customer-dashboard-sidebar" data-sidebar class="w-full lg:w-72 shrink-0 lg:mr-8 bg-white rounded-xl shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
+        <div>
+            <p class="text-xs font-medium uppercase tracking-widest text-gray-400">Akun Saya</p>
+            <h2 class="mt-1 font-semibold text-gray-800">Menu Akun</h2>
+        </div>
+        <button type="button" data-sidebar-toggle class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition" aria-label="Tutup menu akun" aria-controls="customer-dashboard-sidebar" aria-expanded="true">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
             </svg>
         </button>
     </div>
 
-    <div data-inline-sidebar-body>
+    <div class="p-5">
     <div class="text-center mb-6">
         <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-gray-600">
             {{ auth()->user()->initial }}
         </div>
         <h3 class="font-semibold">{{ auth()->user()->name }}</h3>
-        <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
+        <p class="text-sm text-gray-500 break-words">{{ auth()->user()->email }}</p>
     </div>
 
     <nav class="space-y-1">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition {{ request()->routeIs('dashboard') ? 'bg-gray-100 font-medium' : '' }}">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition {{ request()->routeIs('dashboard', 'dashboard.order', 'dashboard.invoice') ? 'bg-gray-100 font-medium' : '' }}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
@@ -52,4 +55,4 @@
         </form>
     </nav>
     </div>
-</div>
+</aside>
