@@ -57,7 +57,23 @@
             <div class="divide-y divide-gray-100">
                 @foreach($order->items as $item)
                 <div class="p-6 flex items-center gap-4">
-                    <div class="w-16 h-16 bg-gray-100 rounded"></div>
+                    <div class="w-16 h-16 flex-shrink-0 overflow-hidden rounded bg-gray-100">
+                        @if($item->product->primaryImage)
+                            <img
+                                src="{{ $item->product->primaryImage->image_path }}"
+                                alt="{{ $item->product->name }}"
+                                loading="lazy"
+                                decoding="async"
+                                class="h-full w-full object-cover"
+                            >
+                        @else
+                            <div class="flex h-full w-full items-center justify-center text-gray-400" aria-label="Gambar produk tidak tersedia">
+                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16.5 8.25 11.25a2.25 2.25 0 0 1 3.182 0L16.5 16.5m-2.25-2.25 1.318-1.318a2.25 2.25 0 0 1 3.182 0L21 16.5M5.25 4.5h13.5A2.25 2.25 0 0 1 21 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 17.25V6.75A2.25 2.25 0 0 1 5.25 4.5Zm4.5 4.125h.008v.008H9.75v-.008Z"/>
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
                     <div class="flex-1">
                         <p class="font-medium">{{ $item->product->name }}</p>
                         <p class="text-sm text-gray-500">Size: {{ $item->size->size ?? '-' }} | Qty: {{ $item->quantity }}</p>

@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     
     // 🔥 RETRY PAYMENT - Baru
     Route::post('/dashboard/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('order.retry-payment');
+    Route::post('/dashboard/orders/{order}/change-payment-method', [OrderController::class, 'changePaymentMethod'])->name('order.change-payment-method');
     
     // 🔥 Complete pre-order payment
     Route::get('/dashboard/orders/{order}/complete-payment/{item}', [OrderController::class, 'completePayment'])->name('order.complete-payment');

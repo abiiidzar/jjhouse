@@ -18,7 +18,7 @@ class CartPage extends Component
     public $selectedCity;
     public $selectedCityName;
     public $shippingCost = 0;
-    public $couriers = ['jne', 'tiki', 'pos'];
+    public $couriers = [];
     public $selectedCourier = 'jne';
     public $originCity = 495; // Jakarta Selatan
 
@@ -26,6 +26,7 @@ class CartPage extends Component
 
     public function mount()
     {
+        $this->couriers = config('shipping.couriers', []);
         $this->loadCart();
         $this->loadProvinces();
     }

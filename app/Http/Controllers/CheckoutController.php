@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\ProductSize;
 use App\Models\PromoCode;
 use App\Services\MidtransService;
 use Illuminate\Http\Request;
@@ -67,7 +66,7 @@ class CheckoutController extends Controller
             'name' => 'nullable|string',
             'shipping_address' => 'required|string',
             'phone' => 'required|string',
-            'payment_method' => 'required|in:midtrans,bank_transfer,gopay',
+            'payment_method' => 'required|in:midtrans,bank_transfer,gopay,qris',
             'postal_code' => 'nullable|string',
             'province' => 'nullable|string',
             'city' => 'nullable|string',           
@@ -113,10 +112,12 @@ class CheckoutController extends Controller
         $shippingCost = $shippingData['shipping_cost'] ?? 0;
         // $totalAmount = $subtotal + $shippingCost;
         $totalAmount = $subtotal;
+        $orderNumber = 'JJY-' . date('Ymd') . '-' . strtoupper(uniqid());
         // 5. Create Order
         $order = Order::create([
             'user_id' => $user->id,
-            'order_number' => 'JJY-' . date('Ymd') . '-' . strtoupper(uniqid()),
+            'order_number' => $orderNumber,
+            'payment_attempt_id' => $orderNumber,
             'total_amount' => $totalAmount,
             'shipping_cost' => $shippingCost,
             'status' => 'pending',
@@ -158,13 +159,13 @@ class CheckoutController extends Controller
                 'remaining_payment' => $remainingPayment,
             ]);
 
-            // Kurangi stok jika bukan preorder
-            if (!$isPreorder && $item->product_size_id) {
-                $productSize = ProductSize::find($item->product_size_id);
-                if ($productSize) {
-                    $productSize->decreaseStock($item->quantity);
-                }
-            }
+        }
+        try {
+            $order->reserveStock();
+        } catch (\RuntimeException $exception) {
+            $order->delete();
+
+            return redirect()->route('checkout')->with('error', $exception->getMessage());
         }
 
         // 7. Bersihkan Cart & Session
@@ -173,7 +174,7 @@ class CheckoutController extends Controller
 
         // 8. Pembayaran Midtrans
         // 🔥 PROSES PEMBAYARAN DENGAN MIDTRANS
-        if (in_array($request->payment_method, ['midtrans', 'bank_transfer', 'gopay'])) {
+        if (in_array($request->payment_method, ['midtrans', 'bank_transfer', 'gopay', 'qris'], true)) {
             $midtrans = new MidtransService();
             
             // Prepare items for Midtrans
@@ -208,11 +209,18 @@ class CheckoutController extends Controller
             ];
 
             // 🔥 Dapatkan Snap Token dari Midtrans
-            $snapToken = $midtrans->createTransaction($order, $items, $customerDetails);
+            $paymentOrder = clone $order;
+            $paymentOrder->order_number = $order->payment_attempt_id;
+            $snapToken = $midtrans->createTransaction($paymentOrder, $items, $customerDetails, $order->payment_method);
 
             if ($snapToken) {
                 // 🔥 Arahkan ke halaman payment dengan Snap Token
-                return view('payment.index', compact('snapToken', 'order'));
+                return view('payment.index', [
+                    'snapToken' => $snapToken,
+                    'order' => $order,
+                    'paymentAttemptId' => $order->payment_attempt_id,
+                    'canChangePaymentMethod' => true,
+                ]);
             } else {
                 // Jika Midtrans gagal, tetap simpan order
                 Log::error('Midtrans transaction failed for order: ' . $order->order_number);
@@ -240,9 +248,13 @@ class CheckoutController extends Controller
                 return response()->json(['message' => 'Invalid notification'], 400);
             }
 
-            $order = Order::where('order_number', $result['order_id'])
-                ->orWhere('order_number', 'like', $result['order_id'] . '%')
-                ->first();
+            $order = Order::where('payment_attempt_id', $result['order_id'])->first()
+                ?? Order::where('order_number', $result['order_id'])->first();
+
+            if (!$order && preg_match('/^(.*)-(?:PAY|RETRY|LUNAS)-[A-Za-z0-9]+$/', $result['order_id'], $matches)) {
+                $order = Order::where('order_number', $matches[1])->first();
+            }
+
             if (!$order) {
                 \Log::error('Order not found for notification', ['order_id' => $result['order_id']]);
                 return response()->json(['message' => 'Order not found'], 404);
@@ -268,7 +280,17 @@ class CheckoutController extends Controller
                 return response()->json(['message' => 'Invalid signature'], 401);
             }
 
-            
+            if ($order->payment_attempt_id && $order->payment_attempt_id !== $result['order_id']) {
+                Log::info('Ignoring notification for a replaced payment attempt', [
+                    'order_id' => $order->id,
+                    'notification_attempt_id' => $result['order_id'],
+                    'active_attempt_id' => $order->payment_attempt_id,
+                ]);
+
+                return response()->json(['message' => 'OK']);
+            }
+
+
             $transactionStatus = $result['transaction_status'];
             $fraudStatus = $result['fraud_status'];
 
@@ -278,32 +300,29 @@ class CheckoutController extends Controller
             ]);
             // Update order status based on transaction
             if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $fraudStatus == 'accept')) {
+                $order->reserveStock();
                 $order->update([
                     'payment_status' => 'paid',
                     'status' => 'processing',
                 ]);
                 Log::info('Order marked as PAID', ['order_id' => $order->id]);
 
-                // Update stock
-                foreach ($order->items as $item) {
-                    if ($item->size) {
-                        $item->size->decreaseStock($item->quantity);
-                    }
-                }
-
                 \Log::info('Order paid successfully', ['order_id' => $order->id]);
             } elseif ($transactionStatus == 'pending') {
+                $order->reserveStock();
                 $order->update([
                     'payment_status' => 'pending',
                     'status' => 'pending',
                 ]);
                 \Log::info('Order pending payment', ['order_id' => $order->id]);
             } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
+                if ($order->payment_status !== 'paid') {
+                    $order->releaseStock('Midtrans payment '.$transactionStatus);
+                }
                 $order->update([
-                    'status' => 'cancelled',
                     'payment_status' => 'failed',
                 ]);
-                \Log::info('Order cancelled/failed', ['order_id' => $order->id]);
+                \Log::info('Payment attempt failed or was cancelled', ['order_id' => $order->id]);
             }
 
             return response()->json(['message' => 'OK']);

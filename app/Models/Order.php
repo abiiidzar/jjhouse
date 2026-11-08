@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class Order extends Model
 {
@@ -17,6 +19,9 @@ class Order extends Model
         'status',
         'payment_status',
         'payment_method',
+        'payment_attempt_id',
+        'stock_reserved',
+        'cancellation_source',
         'paid_amount',
         'shipping_courier',
         'shipping_service',
@@ -36,6 +41,7 @@ class Order extends Model
         'shipping_cost' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
+        'stock_reserved' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -113,5 +119,63 @@ class Order extends Model
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
+    }
+
+    public function reserveStock(): void
+    {
+        DB::transaction(function (): void {
+            $order = self::query()->lockForUpdate()->findOrFail($this->id);
+            if ($order->stock_reserved) {
+                return;
+            }
+
+            $items = $order->items()
+                ->where('is_preorder', false)
+                ->whereNotNull('product_size_id')
+                ->get();
+
+            $sizes = [];
+            foreach ($items as $item) {
+                $size = ProductSize::query()->lockForUpdate()->find($item->product_size_id);
+                if (!$size || $size->stock < $item->quantity) {
+                    throw new RuntimeException('Stok produk tidak mencukupi untuk memproses pesanan ini.');
+                }
+                $sizes[] = [$size, $item->quantity];
+            }
+
+            foreach ($sizes as [$size, $quantity]) {
+                $size->decreaseStock($quantity, 'Order stock reserved', $order->id);
+            }
+
+            $order->update(['stock_reserved' => true]);
+        });
+
+        $this->refresh();
+    }
+
+    public function releaseStock(string $reason = 'Order cancelled'): void
+    {
+        DB::transaction(function () use ($reason): void {
+            $order = self::query()->lockForUpdate()->findOrFail($this->id);
+            if (!$order->stock_reserved) {
+                return;
+            }
+
+            $order->update(['stock_reserved' => false]);
+
+            $items = $order->items()
+                ->where('is_preorder', false)
+                ->whereNotNull('product_size_id')
+                ->get();
+
+            foreach ($items as $item) {
+                $size = ProductSize::query()->lockForUpdate()->find($item->product_size_id);
+                if ($size) {
+                    $size->restoreStockFromOrder($item->quantity, $order->id, $reason);
+                }
+            }
+        });
+
+        $this->refresh();
     }
 }

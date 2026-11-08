@@ -15,159 +15,243 @@
 
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            margin: 0;
+            padding: 24px;
+            display: grid;
+            place-items: center;
+            background: #f9fafb;
+            color: #111827;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
+
         .payment-container {
-            background: white;
-            border-radius: 20px;
-            padding: 48px;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            width: min(100%, 480px);
+            padding: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .payment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+
+        .logo-mark {
+            display: inline-grid;
+            width: 30px;
+            height: 30px;
+            place-items: center;
+            background: #111827;
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 0;
+        }
+
+        .secure-label {
+            color: #4b5563;
+            font-size: 12px;
+        }
+
+        .payment-content {
+            padding-top: 24px;
             text-align: center;
         }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: -1px;
-            margin-bottom: 8px;
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
         }
-        .logo span:first-child {
-            background: #000;
-            color: #fff;
-            padding: 4px 10px;
-        }
-        .order-number {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
+
         .amount {
-            font-size: 36px;
-            font-weight: bold;
-            color: #1a1a1a;
-            margin: 16px 0;
+            margin: 0;
+            font-size: clamp(28px, 8vw, 36px);
+            font-weight: 600;
+            letter-spacing: -.03em;
+            font-variant-numeric: tabular-nums;
         }
-        .amount small {
-            font-size: 16px;
-            font-weight: normal;
-            color: #666;
+
+        .order-number {
+            margin: 8px 0 0;
+            color: #4b5563;
+            font-size: 13px;
+            overflow-wrap: anywhere;
         }
+
         .status-box {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 20px 0;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-        }
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #e9ecef;
-            border-top: 3px solid #000;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .btn-back {
-            display: inline-block;
-            margin-top: 16px;
-            color: #666;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-        .btn-back:hover {
-            color: #000;
-        }
-        .error-message {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 12px;
+            margin-top: 24px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
-            margin: 16px 0;
+            background: #f9fafb;
+        }
+
+        .status-box span {
+            color: #374151;
             font-size: 14px;
         }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 auto;
+            border: 2px solid #d1d5db;
+            border-top-color: #111827;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .payment-method-badge {
             display: inline-block;
-            background: #e9ecef;
-            padding: 4px 12px;
-            border-radius: 20px;
+            margin-top: 16px;
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 999px;
+            color: #374151;
             font-size: 12px;
-            color: #495057;
+            font-weight: 500;
         }
+
         .retry-btn {
-            background: #000;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            width: 100%;
+            margin-top: 16px;
+            padding: 13px 20px;
+            border: 1px solid #111827;
+            border-radius: 6px;
+            background: #111827;
+            color: #fff;
             font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 12px;
+            transition: background-color .18s ease, border-color .18s ease;
         }
+
         .retry-btn:hover {
-            background: #333;
+            border-color: #374151;
+            background: #374151;
+        }
+
+        .retry-btn:focus-visible,
+        .btn-back:focus-visible {
+            outline: 2px solid #111827;
+            outline-offset: 3px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #374151;
+            font-size: 13px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .btn-back:hover {
+            color: #111827;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .payment-container {
+                padding: 24px 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .spinner {
+                animation-duration: 1.8s;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="payment-container">
-        <div class="logo">
-            <span>JJY</span><span>HOUSE</span>
-        </div>
+    <main class="payment-container">
+        <header class="payment-header">
+            <div class="logo">
+                <span class="logo-mark">JJY</span>
+                <span>JJHOUSE</span>
+            </div>
+            <span class="secure-label">Secure checkout</span>
+        </header>
 
-        <div class="order-number">Order #{{ preg_replace('/[^a-zA-Z0-9\-_~.]/', '-', $order->order_number) }}</div>
+        <section class="payment-content" aria-labelledby="payment-title">
+            <p class="eyebrow" id="payment-title">Complete your payment</p>
+            <p class="amount">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</p>
+            <p class="order-number">Order #{{ preg_replace('/[^a-zA-Z0-9\-_~.]/', '-', $order->order_number) }}</p>
 
-        <div class="amount">
-            Rp {{ number_format($order->grand_total, 0, ',', '.') }}
-            <small>total</small>
-        </div>
+            <div class="status-box" role="status" aria-live="polite">
+                <div class="spinner" aria-hidden="true"></div>
+                <span>Preparing your secure payment...</span>
+            </div>
 
-        <div class="status-box">
-            <div class="spinner"></div>
-            <span style="color: #495057; font-size: 14px;">Preparing your payment...</span>
-        </div>
+            <span class="payment-method-badge">
+                {{ $order->payment_method === 'midtrans'
+                    ? 'All available payment methods'
+                    : ($order->payment_method === 'qris' ? 'QRIS' : ucfirst(str_replace('_', ' ', $order->payment_method))) }}
+            </span>
 
-        <p style="color: #666; font-size: 13px; margin-bottom: 8px;">
-            You will be redirected to the payment gateway
-        </p>
-        <span class="payment-method-badge">
-            {{ ucfirst(str_replace('_', ' ', $order->payment_method)) }}
-        </span>
+            <button id="pay-now-btn" class="retry-btn" style="display: none;">
+                Continue to payment
+            </button>
 
-        <!-- 🔥 Tombol untuk membuka Snap jika auto-redirect tidak berhasil -->
-        <button id="pay-now-btn" class="retry-btn" style="display: none;">
-            Pay Now
-        </button>
+            @if($canChangePaymentMethod ?? true)
+                <form
+                    action="{{ route('order.change-payment-method', $order) }}"
+                    method="POST"
+                    id="change-payment-form"
+                    style="display: none;"
+                >
+                    @csrf
+                    <input type="hidden" name="payment_attempt_id" value="{{ $paymentAttemptId ?? $order->payment_attempt_id ?? $order->order_number }}">
+                    <button type="submit" class="retry-btn">
+                        Switch to another payment method
+                    </button>
+                </form>
+            @endif
 
-        <a href="{{ route('dashboard') }}" class="btn-back">
-            ← Back to Dashboard
-        </a>
-    </div>
+            <div>
+                <a href="{{ route('dashboard') }}" class="btn-back">Back to dashboard</a>
+            </div>
+        </section>
+    </main>
 
     <script>
-        // 🔥 Fungsi untuk membuka payment popup
+        const snapToken = @json($snapToken);
+
         function openSnapPayment() {
-            window.snap.pay('{{ $snapToken }}', {
+            window.snap.pay(snapToken, {
                 onSuccess: function(result) {
                     window.location.href = '{{ route("dashboard") }}?payment=success';
                 },
@@ -178,30 +262,38 @@
                     window.location.href = '{{ route("dashboard") }}?payment=error';
                 },
                 onClose: function() {
-                    // User menutup popup tanpa menyelesaikan pembayaran
-                    if (confirm('Payment not completed. Are you sure you want to leave?')) {
-                        window.location.href = '{{ route("dashboard") }}';
+                    document.querySelector('.spinner').hidden = true;
+                    document.querySelector('.status-box span').textContent =
+                        'Payment window closed. Reopen it or switch to another method.';
+                    document.getElementById('pay-now-btn').style.display = 'block';
+
+                    const changePaymentForm = document.getElementById('change-payment-form');
+                    if (changePaymentForm) {
+                        changePaymentForm.style.display = 'block';
                     }
                 }
             });
         }
 
-        // 🔥 Auto-open Snap payment setelah halaman dimuat
         document.addEventListener('DOMContentLoaded', function() {
-            // Tunggu 1 detik untuk memastikan Snap sudah ready
             setTimeout(function() {
                 try {
-                    if (typeof window.snap !== 'undefined') {
+                    if (window.snap && typeof window.snap.pay === 'function') {
                         openSnapPayment();
                     } else {
                         throw new Error('Snap not loaded');
                     }
                 } catch (e) {
                     console.error('Snap payment error:', e);
-                    // Tampilkan tombol manual jika auto-open gagal
+                    document.querySelector('.spinner').hidden = true;
                     document.getElementById('pay-now-btn').style.display = 'block';
                     document.getElementById('pay-now-btn').onclick = openSnapPayment;
-                    document.querySelector('.status-box span').textContent = 'Click "Pay Now" to continue';
+                    document.querySelector('.status-box span').textContent = 'Payment window did not load. Try again to continue.';
+
+                    const changePaymentForm = document.getElementById('change-payment-form');
+                    if (changePaymentForm) {
+                        changePaymentForm.style.display = 'block';
+                    }
                 }
             }, 1500);
         });

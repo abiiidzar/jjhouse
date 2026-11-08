@@ -58,7 +58,7 @@ class ProductSize extends Model
         return $this->stock > 0;
     }
 
-    public function decreaseStock($quantity)
+    public function decreaseStock($quantity, string $notes = 'Order checkout', ?int $orderId = null)
     {
 
     $before = $this->stock;
@@ -75,9 +75,27 @@ class ProductSize extends Model
         'action' => 'sold',
         'quantity_before' => $before,
         'quantity_after' => $after,
-        'notes' => 'Order checkout',
+        'notes' => $notes,
         'reference_type' => 'order',
+        'reference_id' => $orderId,
     ]);
+    }
+
+    public function restoreStockFromOrder(int $quantity, int $orderId, string $reason): void
+    {
+        $before = $this->stock;
+        $this->increment('stock', $quantity);
+        $this->refresh();
+
+        StockHistory::createHistory($this, [
+            'user_id' => Auth::id(),
+            'action' => 'restock',
+            'quantity_before' => $before,
+            'quantity_after' => $this->stock,
+            'notes' => $reason,
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+        ]);
     }
 
     public function syncProductStock()

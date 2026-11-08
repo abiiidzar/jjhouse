@@ -3,6 +3,13 @@
 @section('title', 'Checkout')
 
 @section('content')
+<style>
+    #checkout-form [data-payment-option]:has(input:checked) {
+        border-color: #111827;
+        background-color: #f9fafb;
+    }
+</style>
+
 <section data-theme="light" class="bg-white min-h-screen">
     <div class="max-w-7xl mx-auto grid md:grid-cols-2">
         <!-- LEFT -->
@@ -71,211 +78,33 @@
                         </p>
 
 
-                        {{-- ========================================================= --}}
-                        {{-- CREDIT / DEBIT CARD --}}
-                        {{-- ========================================================= --}}
-
-                        <div
-                            class="border rounded-lg p-4 mb-3 flex items-center justify-between
-                            transition cursor-pointer
-                            hover:border-gray-400
-                            {{ old('payment_method', 'midtrans') == 'midtrans'
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 bg-white' }}"
+                        <label
+                            data-payment-option
+                            class="border border-gray-200 bg-white rounded-lg p-4 flex cursor-pointer transition hover:border-gray-400"
                         >
-
-                            <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
-
+                            <span class="flex items-start gap-3">
                                 <input
                                     type="radio"
                                     name="payment_method"
                                     value="midtrans"
                                     {{ old('payment_method', 'midtrans') == 'midtrans' ? 'checked' : '' }}
-                                    class="w-4 h-4 shrink-0 text-blue-600
-                                        focus:ring-blue-500"
+                                    class="mt-1 h-4 w-4 shrink-0 accent-black focus:ring-gray-900"
                                 >
-
-                                <div class="min-w-0">
-
-                                    <span class="font-medium text-sm sm:text-base">
-                                        Credit / Debit Card
+                                <span>
+                                    <span class="block font-medium text-sm sm:text-base">All available payment methods</span>
+                                    <span class="mt-1 block text-xs sm:text-sm text-gray-600">
+                                        Choose from the methods enabled for this store in Midtrans.
                                     </span>
-
-                                    <p class="text-xs sm:text-sm text-gray-500">
-                                        Visa, Mastercard, JCB, Amex
-                                    </p>
-
-                                </div>
-
-                            </label>
-
-
-                            {{-- Card Logos --}}
-                            <div class="flex items-center gap-2 ml-3 shrink-0">
-
-                                <img
-                                    src="{{ asset('images/payment/visa.svg') }}"
-                                    alt="Visa"
-                                    class="h-5 w-auto max-w-[42px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/mastercard.svg') }}"
-                                    alt="Mastercard"
-                                    class="h-5 w-auto max-w-[42px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/jcb.svg') }}"
-                                    alt="JCB"
-                                    class="hidden sm:block h-4 w-auto max-w-[32px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/amex.svg') }}"
-                                    alt="American Express"
-                                    class="hidden sm:block h-4 w-auto max-w-[32px] object-contain"
-                                >
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- ========================================================= --}}
-                        {{-- BANK TRANSFER --}}
-                        {{-- ========================================================= --}}
-
-                        <div
-                            class="border rounded-lg p-4 mb-3 flex items-center justify-between
-                            transition cursor-pointer
-                            hover:border-gray-400
-                            {{ old('payment_method') == 'bank_transfer'
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 bg-white' }}"
-                        >
-
-                            <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
-
-                                <input
-                                    type="radio"
-                                    name="payment_method"
-                                    value="bank_transfer"
-                                    {{ old('payment_method') == 'bank_transfer' ? 'checked' : '' }}
-                                    class="w-4 h-4 shrink-0 text-blue-600
-                                        focus:ring-blue-500"
-                                >
-
-                                <div class="min-w-0">
-
-                                    <span class="font-medium text-sm sm:text-base">
-                                        Bank Transfer
+                                    <span class="mt-3 flex flex-wrap gap-2 text-xs text-gray-700">
+                                        <span class="rounded border border-gray-200 px-2 py-1">Cards</span>
+                                        <span class="rounded border border-gray-200 px-2 py-1">Bank transfer &amp; virtual account</span>
+                                        <span class="rounded border border-gray-200 px-2 py-1">E-wallet &amp; QRIS</span>
+                                        <span class="rounded border border-gray-200 px-2 py-1">Retail outlets</span>
+                                        <span class="rounded border border-gray-200 px-2 py-1">PayLater</span>
                                     </span>
-
-                                    <p class="text-xs sm:text-sm text-gray-500">
-                                        BCA, Mandiri, BNI, BRI
-                                    </p>
-
-                                </div>
-
-                            </label>
-
-
-                            {{-- Bank Logos --}}
-                            <div class="flex items-center gap-2 ml-3 shrink-0">
-
-                                <img
-                                    src="{{ asset('images/payment/bca.svg') }}"
-                                    alt="BCA"
-                                    class="h-4 w-auto max-w-[42px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/mandiri.svg') }}"
-                                    alt="Mandiri"
-                                    class="h-4 w-auto max-w-[50px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/bni.svg') }}"
-                                    alt="BNI"
-                                    class="hidden sm:block h-4 w-auto max-w-[40px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/bri.svg') }}"
-                                    alt="BRI"
-                                    class="hidden sm:block h-4 w-auto max-w-[40px] object-contain"
-                                >
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- ========================================================= --}}
-                        {{-- E-WALLET --}}
-                        {{-- ========================================================= --}}
-
-                        <div
-                            class="border rounded-lg p-4 flex items-center justify-between
-                            transition cursor-pointer
-                            hover:border-gray-400
-                            {{ old('payment_method') == 'gopay'
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 bg-white' }}"
-                        >
-
-                            <label class="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
-
-                                <input
-                                    type="radio"
-                                    name="payment_method"
-                                    value="gopay"
-                                    {{ old('payment_method') == 'gopay' ? 'checked' : '' }}
-                                    class="w-4 h-4 shrink-0 text-blue-600
-                                        focus:ring-blue-500"
-                                >
-
-                                <div class="min-w-0">
-
-                                    <span class="font-medium text-sm sm:text-base">
-                                        E-Wallet
-                                    </span>
-
-                                    <p class="text-xs sm:text-sm text-gray-500">
-                                        GoPay, OVO, ShopeePay
-                                    </p>
-
-                                </div>
-
-                            </label>
-
-
-                            {{-- E-Wallet Logos --}}
-                            <div class="flex items-center gap-2 ml-3 shrink-0">
-
-                                <img
-                                    src="{{ asset('images/payment/gopay.svg') }}"
-                                    alt="GoPay"
-                                    class="h-4 w-auto max-w-[45px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/ovo.svg') }}"
-                                    alt="OVO"
-                                    class="h-4 w-auto max-w-[40px] object-contain"
-                                >
-
-                                <img
-                                    src="{{ asset('images/payment/shopeepay.svg') }}"
-                                    alt="ShopeePay"
-                                    class="h-4 w-auto max-w-[55px] object-contain"
-                                >
-
-                            </div>
-
-                        </div>
+                                </span>
+                            </span>
+                        </label>
 
 
                         {{-- ========================================================= --}}
@@ -365,7 +194,7 @@
 
                     <!-- SUBMIT -->
                     <button type="submit" id="submit-btn"
-                            class="w-full bg-blue-600 text-white py-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                            class="w-full bg-black text-white py-4 rounded-lg text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition">
                         Pay now
                     </button>
                 </form>

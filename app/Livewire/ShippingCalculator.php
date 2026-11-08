@@ -185,7 +185,7 @@ class ShippingCalculator extends Component
                 origin: $this->getDefaultOriginCityId(),
                 destination: $this->city_id,
                 weight: $totalWeight,
-                courier: 'jne,tiki,pos'
+                courier: implode(',', config('shipping.couriers', []))
             );
 
             // 🔥 Cek apakah ada error
@@ -219,7 +219,8 @@ class ShippingCalculator extends Component
                         'service' => $cost['service'],
                         'description' => $cost['description'] ?? $cost['service'],
                         'cost' => $cost['cost'][0]['value'],
-                        'etd' => $cost['cost'][0]['etd'] ?? '?',
+                        'etd' => $cost['cost'][0]['etd'] ?? null,
+                        'is_cargo' => $cost['is_cargo'] ?? false,
                     ];
                 }
             }

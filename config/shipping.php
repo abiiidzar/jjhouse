@@ -26,4 +26,13 @@ return [
     |--------------------------------------------------------------------------
     */
     'free_shipping_threshold' => env('SHIPPING_FREE_THRESHOLD', 200000),
+
+    'couriers' => [
+        'jne',
+        'jnt',
+        'sicepat',
+        'ninja',
+        'tiki',
+        'spx',
+    ],
 ];

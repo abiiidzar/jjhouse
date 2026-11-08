@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\Pool;
 
 class RajaOngkirService
 {
@@ -21,7 +22,7 @@ class RajaOngkirService
         $this->apiKey = cache('shipping_rajaongkir_api_key') 
             ?? config('services.rajaongkir.api_key');
             
-        $this->baseUrl = config('services.rajaongkir.base_url', 'https://api.rajaongkir.com/starter');
+        $this->baseUrl = config('services.rajaongkir.base_url', 'https://rajaongkir.komerce.id/api/v1');
         
         // 🔥 PRIORITAS: Baca origin city dari cache, fallback ke config
         $this->originCity = cache('shipping_default_origin_city') 
@@ -97,29 +98,6 @@ class RajaOngkirService
             return $provinces;
         }
 
-        // 🔥 FALLBACK: Coba API hanya jika data lokal kosong (timeout pendek 5 detik)
-        try {
-            Log::info('RajaOngkir getProvinces attempt');
-            
-            $response = Http::timeout(5)->withHeaders([
-                'key' => $this->apiKey,
-            ])->get($this->baseUrl . '/province');
-
-            if ($response->successful()) {
-                $result = $response->json();
-                if (isset($result['rajaongkir']['status']['code']) && $result['rajaongkir']['status']['code'] == 200) {
-                    $provinces = $result['rajaongkir']['results'] ?? [];
-                    if (!empty($provinces)) {
-                        Cache::put($cacheKey, $provinces, 86400);
-                        return $provinces;
-                    }
-                }
-            }
-            Log::error('RajaOngkir Province Error: ' . ($response->successful() ? json_encode($response->json()) : $response->body()));
-        } catch (\Exception $e) {
-            Log::warning('RajaOngkir Province Exception: ' . $e->getMessage());
-        }
-
         return $provinces;
     }
 
@@ -157,30 +135,6 @@ class RajaOngkirService
         if (!empty($cities)) {
             Cache::put($cacheKey, $cities, 86400);
             return $cities;
-        }
-
-        // 🔥 FALLBACK: Coba API hanya jika data lokal kosong (timeout pendek 5 detik)
-        try {
-            $params = $provinceId ? ['province' => $provinceId] : [];
-            $response = Http::timeout(5)->withHeaders([
-                'key' => $this->apiKey,
-            ])->get($this->baseUrl . '/city', $params);
-
-            if ($response->successful()) {
-                $result = $response->json();
-                if (isset($result['rajaongkir']['status']['code']) && $result['rajaongkir']['status']['code'] == 200) {
-                    $cities = $result['rajaongkir']['results'] ?? [];
-                    if (!empty($cities)) {
-                        // 🔥 TAMBAHKAN: Merge postal code dari lokal
-                        $cities = $this->mergePostalCode($cities);
-                        Cache::put($cacheKey, $cities, 86400);
-                        return $cities;
-                    }
-                }
-            }
-            Log::error('RajaOngkir City Error: ' . ($response->successful() ? json_encode($response->json()) : $response->body()));
-        } catch (\Exception $e) {
-            Log::warning('RajaOngkir City Exception: ' . $e->getMessage());
         }
 
         return $cities;
@@ -382,73 +336,298 @@ class RajaOngkirService
     }
     public function calculateCost($origin, $destination, $weight, $courier)
     {
-        // 🔥 Jika API key kosong, langsung gunakan estimasi lokal (tanpa menunggu timeout)
         if (empty($this->apiKey)) {
-            Log::warning('RajaOngkir API Key is EMPTY, using local fallback immediately');
-            return $this->calculateCostLocal($origin, $destination, $weight, $courier);
+            Log::warning('RajaOngkir API key is empty');
+            return ['success' => false, 'message' => 'API key RajaOngkir belum diatur'];
+        }
+
+        $couriers = array_values(array_unique(array_filter(array_map(
+            fn (string $code): string => strtolower(trim($code)),
+            explode(',', (string) $courier)
+        ))));
+        $validCouriers = config('shipping.couriers', []);
+        $invalidCouriers = array_values(array_diff($couriers, $validCouriers));
+
+        if (empty($couriers) || !empty($invalidCouriers)) {
+            return [
+                'success' => false,
+                'message' => empty($couriers)
+                    ? 'Pilih minimal satu kurir yang valid'
+                    : 'Kode kurir tidak valid: ' . implode(', ', $invalidCouriers),
+            ];
         }
 
         try {
-            // 🔥 Gunakan timeout sangat pendek (2 detik) agar tidak membuat user menunggu lama
-            // Jika API lambat/tidak merespons, langsung fallback ke estimasi lokal
-            $response = Http::timeout(2)->withHeaders([
-                'key' => $this->apiKey,
-                'content-type' => 'application/x-www-form-urlencoded',
-            ])->post($this->baseUrl . '/cost', [
-                'origin' => $origin,
-                'destination' => $destination,
-                'weight' => $weight,
-                'courier' => $courier,
-            ]);
+            $originId = $this->resolveApiDestinationId($origin);
+            $destinationId = $this->resolveApiDestinationId($destination);
 
-            if ($response->successful()) {
-                $result = $response->json();
-                
-                // Cek status response
-                if ($result['rajaongkir']['status']['code'] == 200) {
-                    // 🔥 Kembalikan data lengkap semua kurir (code, name, costs)
-                    // agar konsisten dengan format fallback lokal
-                    $results = $result['rajaongkir']['results'] ?? [];
-                    $data = [];
-                    foreach ($results as $courier) {
-                        $data[] = [
-                            'code' => $courier['code'] ?? '',
-                            'name' => $courier['name'] ?? $courier['code'] ?? '',
-                            'costs' => $courier['costs'] ?? [],
-                        ];
-                    }
-                    return [
-                        'success' => true,
-                        'data' => $data,
-                        'is_local' => false,
-                    ];
-                } else {
-                    return [
-                        'success' => false,
-                        'message' => $result['rajaongkir']['status']['description'] ?? 'Gagal mendapatkan ongkir'
-                    ];
-                }
+            if ($originId === null || $destinationId === null) {
+                return [
+                    'success' => false,
+                    'message' => 'Kota asal atau tujuan tidak ditemukan di RajaOngkir',
+                ];
             }
-            
-            Log::error('RajaOngkir Cost Error: ' . $response->body());
+
+            $cacheKeys = [];
+            $couriersToFetch = [];
+            $costResults = [];
+
+            foreach ($couriers as $code) {
+                $cacheKey = 'rajaongkir_cost_' . hash('sha256', implode('|', [
+                    rtrim($this->baseUrl, '/'),
+                    hash('sha256', $this->apiKey),
+                    $originId,
+                    $destinationId,
+                    (int) $weight,
+                    $code,
+                ]));
+                $cacheKeys[$code] = $cacheKey;
+
+                if (Cache::has($cacheKey)) {
+                    $costResults = array_merge($costResults, Cache::get($cacheKey));
+                    continue;
+                }
+
+                $couriersToFetch[] = $code;
+            }
+
+            $responses = Http::pool(function (Pool $pool) use ($couriersToFetch, $originId, $destinationId, $weight) {
+                foreach ($couriersToFetch as $code) {
+                    $pool->as($code)
+                        ->asForm()
+                        ->acceptJson()
+                        ->timeout($this->timeout)
+                        ->withHeaders(['key' => $this->apiKey])
+                        ->post(rtrim($this->baseUrl, '/') . '/calculate/domestic-cost', [
+                            'origin' => $originId,
+                            'destination' => $destinationId,
+                            'weight' => $weight,
+                            'courier' => $code,
+                        ]);
+                }
+            }, concurrency: 5);
+
+            $apiErrors = [];
+
+            foreach ($responses as $code => $response) {
+                if ($response instanceof \Throwable) {
+                    $apiErrors[] = $response->getMessage();
+                    Log::warning('RajaOngkir courier request failed', [
+                        'courier' => $code,
+                        'error' => $response->getMessage(),
+                    ]);
+                    continue;
+                }
+
+                $result = $response->json() ?? [];
+                $apiStatus = $result['meta'] ?? [];
+
+                if (!$response->successful() || (int) ($apiStatus['code'] ?? 0) !== 200) {
+                    $message = $apiStatus['message'] ?? 'Gagal mendapatkan ongkir dari RajaOngkir';
+                    $apiErrors[] = $message;
+                    Log::warning('RajaOngkir cost request failed', [
+                        'courier' => $code,
+                        'http_status' => $response->status(),
+                        'api_message' => $message,
+                    ]);
+                    continue;
+                }
+
+                $data = $result['data'] ?? [];
+                Cache::put($cacheKeys[$code], $data, now()->addHours(6));
+                $costResults = array_merge($costResults, $data);
+            }
+
+            if (empty($costResults)) {
+                return [
+                    'success' => false,
+                    'message' => $apiErrors[0] ?? 'Tidak ada layanan kurir untuk rute ini',
+                ];
+            }
+
             return [
-                'success' => false,
-                'message' => 'Gagal terhubung ke server'
+                'success' => true,
+                'data' => $this->filterCargoOptions(
+                    $this->normalizeCostResults($costResults),
+                    (int) $weight
+                ),
+                'is_local' => false,
             ];
-            
         } catch (\Exception $e) {
             Log::warning('RajaOngkir Cost Exception (fallback to local): ' . $e->getMessage());
-            
-            // 🔥 FALLBACK: Gunakan perhitungan ongkir lokal (offline)
             return $this->calculateCostLocal($origin, $destination, $weight, $courier);
         }
+    }
+
+    private function resolveApiDestinationId($cityId): int|string|null
+    {
+        $city = $this->getCityById($cityId);
+        if (!$city || empty($city['city_name'])) {
+            return null;
+        }
+
+        $province = collect($this->getLocalProvinces())
+            ->firstWhere('province_id', $city['province_id'] ?? null);
+        $provinceName = $province['province'] ?? null;
+        $cacheKey = 'rajaongkir_destination_' . hash(
+            'sha256',
+            strtolower($city['city_name'] . '|' . ($provinceName ?? ''))
+        );
+
+        return Cache::remember($cacheKey, 86400, function () use ($city, $provinceName) {
+            $response = Http::acceptJson()
+                ->timeout($this->timeout)
+                ->withHeaders(['key' => $this->apiKey])
+                ->get(rtrim($this->baseUrl, '/') . '/destination/domestic-destination', [
+                    'search' => $city['city_name'],
+                    'limit' => 100,
+                    'offset' => 0,
+                ]);
+
+            $result = $response->json() ?? [];
+            $apiStatus = $result['meta'] ?? [];
+
+            if (!$response->successful() || (int) ($apiStatus['code'] ?? 0) !== 200) {
+                throw new \RuntimeException(
+                    $apiStatus['message'] ?? 'Gagal mencari tujuan di RajaOngkir'
+                );
+            }
+
+            $destinations = $result['data'] ?? [];
+            $cityName = mb_strtolower(trim($city['city_name']));
+            $provinceName = $provinceName ? mb_strtolower(trim($provinceName)) : null;
+            $matchingCities = array_values(array_filter(
+                $destinations,
+                fn (array $destination): bool => mb_strtolower(trim($destination['city_name'] ?? '')) === $cityName
+                    && isset($destination['id'])
+            ));
+
+            if ($provinceName) {
+                foreach ($matchingCities as $destination) {
+                    if (mb_strtolower(trim($destination['province_name'] ?? '')) === $provinceName) {
+                        return $destination['id'];
+                    }
+                }
+            }
+
+            if (!empty($matchingCities)) {
+                return $matchingCities[0]['id'];
+            }
+
+            throw new \RuntimeException("Kota {$city['city_name']} tidak ditemukan di RajaOngkir");
+        });
+    }
+
+    private function normalizeCostResults(array $results): array
+    {
+        $couriers = [];
+
+        foreach ($results as $result) {
+            $code = strtolower($result['code'] ?? '');
+            if ($code === '') {
+                continue;
+            }
+
+            $couriers[$code] ??= [
+                'code' => $code,
+                'name' => $result['name'] ?? strtoupper($code),
+                'costs' => [],
+            ];
+
+            $rawCost = $result['cost'] ?? 0;
+            if (is_array($rawCost) && array_key_exists('value', $rawCost)) {
+                $cost = $rawCost;
+            } elseif (is_array($rawCost) && isset($rawCost[0]) && is_array($rawCost[0])) {
+                $cost = $rawCost[0];
+            } else {
+                $cost = [
+                    'value' => (int) $rawCost,
+                    'etd' => $result['etd'] ?? '?',
+                    'note' => '',
+                ];
+            }
+
+            $couriers[$code]['costs'][] = [
+                'service' => $result['service'] ?? $code,
+                'description' => $this->normalizeServiceDescription(
+                    $result['service'] ?? $code,
+                    $result['description'] ?? ($result['service'] ?? $code)
+                ),
+                'cost' => [[
+                    'value' => (int) ($cost['value'] ?? 0),
+                    'etd' => $this->normalizeEtd($cost['etd'] ?? $result['etd'] ?? null),
+                    'note' => $cost['note'] ?? '',
+                ]],
+            ];
+        }
+
+        return array_values($couriers);
+    }
+
+    public function filterCargoOptions(array $couriers, int $weight): array
+    {
+        foreach ($couriers as &$courier) {
+            $filteredCosts = [];
+
+            foreach ($courier['costs'] as $cost) {
+                $service = preg_replace('/[^A-Z0-9<>]/', '', strtoupper($cost['service'] ?? ''));
+                $isJtrTier = in_array($service, ['JTR<130', 'JTR>130', 'JTR>200'], true);
+                $isCargo = $isJtrTier || in_array($service, [
+                    'JTR',
+                    'IDTRUCK',
+                    'BIGPACK',
+                    'MIC',
+                    'DRGREG',
+                ], true);
+
+                if ($isJtrTier && $weight < 100000) {
+                    continue;
+                }
+
+                if ($isCargo && $weight < 5000) {
+                    continue;
+                }
+
+                $cost['is_cargo'] = $isCargo;
+                $filteredCosts[] = $cost;
+            }
+
+            $courier['costs'] = $filteredCosts;
+        }
+
+        unset($courier);
+
+        return array_values(array_filter(
+            $couriers,
+            fn (array $courier): bool => !empty($courier['costs'])
+        ));
+    }
+
+    private function normalizeEtd(mixed $etd): ?string
+    {
+        if (!is_scalar($etd)) {
+            return null;
+        }
+
+        $etd = trim(preg_replace('/\s*(?:days?|hari)\s*/i', '', (string) $etd));
+
+        return $etd === '' || $etd === '-' ? null : $etd;
+    }
+
+    private function normalizeServiceDescription(string $service, string $description): string
+    {
+        if (strcasecmp(trim($service), 'Pos Reguler') === 0 && is_numeric(trim($description))) {
+            return 'Layanan Pos Reguler';
+        }
+
+        return $description;
     }
 
     /**
      * 🔥 FALLBACK: Hitung ongkir secara lokal (offline) ketika API tidak dapat dijangkau
      * Menggunakan tarif estimasi berdasarkan jarak/region
      */
-    public function calculateCostLocal($origin, $destination, $weight, $courier = 'jne,tiki,pos')
+    public function calculateCostLocal($origin, $destination, $weight, $courier = null)
     {
         Log::info("RajaOngkir using LOCAL fallback for cost (origin: {$origin}, dest: {$destination}, weight: {$weight}g)");
         
@@ -514,7 +693,7 @@ class RajaOngkirService
         // Parse courier list
         $couriers = array_filter(array_map('trim', explode(',', $courier)));
         if (empty($couriers)) {
-            $couriers = ['jne', 'tiki', 'pos'];
+            $couriers = config('shipping.couriers', ['jne', 'sicepat', 'ide', 'sap', 'jnt', 'ninja', 'tiki', 'lion', 'anteraja', 'pos', 'ncs', 'rex', 'rpx', 'sentral', 'star', 'wahana', 'spx']);
         }
         
         $courierNames = [
@@ -577,33 +756,37 @@ class RajaOngkirService
         ];
     }
 
-    public function testConnection()
+    public function testConnection(int $timeout = 10)
     {
         if (empty($this->apiKey)) {
             return ['status' => 'error', 'message' => 'RajaOngkir API key is not configured'];
         }
 
         try {
-            $response = Http::timeout(10)
+            $response = Http::acceptJson()
+                ->timeout($timeout)
                 ->withHeaders(['key' => $this->apiKey])
-                ->get(rtrim($this->baseUrl, '/') . '/province');
+                ->get(rtrim($this->baseUrl, '/') . '/destination/domestic-destination', [
+                    'search' => 'Jakarta',
+                    'limit' => 1,
+                    'offset' => 0,
+                ]);
 
+            $result = $response->json() ?? [];
+            $apiStatus = $result['meta'] ?? [];
             if (!$response->successful()) {
                 return [
                     'status' => 'error',
-                    'message' => 'RajaOngkir returned HTTP ' . $response->status(),
+                    'message' => $apiStatus['message'] ?? 'RajaOngkir returned HTTP ' . $response->status(),
                 ];
             }
 
-            $result = $response->json();
-            $apiStatus = $result['rajaongkir']['status'] ?? [];
-
-            if (($apiStatus['code'] ?? null) == 200) {
+            if ((int) ($apiStatus['code'] ?? 0) === 200) {
                 return [
                     'status' => 'success',
                     'message' => 'Connected directly to RajaOngkir API',
                     'data' => [
-                        'province_count' => count($result['rajaongkir']['results'] ?? []),
+                        'destination_count' => count($result['data'] ?? []),
                     ],
                 ];
             }
@@ -615,7 +798,7 @@ class RajaOngkirService
         } catch (\Exception $e) {
             Log::warning('RajaOngkir connection test failed: ' . $e->getMessage());
 
-            return ['status' => 'error', 'message' => 'Unable to reach RajaOngkir API'];
+            return ['status' => 'error', 'message' => 'Request RajaOngkir gagal: ' . $e->getMessage()];
         }
     }
 

@@ -16,13 +16,14 @@ class CartPage extends Component
     public $selectedProvince;
     public $selectedCity;
     public $shippingCost = 0;
-    public $couriers = ['jne', 'tiki', 'pos'];
+    public $couriers = [];
     public $selectedCourier = 'jne';
 
     protected $listeners = ['cartUpdated' => 'loadCart'];
 
     public function mount()
     {
+        $this->couriers = config('shipping.couriers', []);
         $this->loadCart();
         $this->loadProvinces();
     }

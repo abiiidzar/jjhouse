@@ -29,6 +29,22 @@
                 </a>
             </div>
 
+            @if(session('error'))
+                <div role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if(session('warning'))
+                <div role="status" class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                    {{ session('warning') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div role="status" class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <!-- 🔥 PAYMENT STATUS & RETRY BUTTON -->
             @if($order->payment_status == 'unpaid' || $order->payment_status == 'failed' || $order->status == 'pending')
             <div class="mb-8 rounded-xl overflow-hidden border

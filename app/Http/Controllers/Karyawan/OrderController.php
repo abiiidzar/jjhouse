@@ -42,12 +42,19 @@ class OrderController extends Controller
         ]);
 
         $oldStatus = $order->status;
-        $updates = ['status' => $validated['status']];
+        $updates = [
+            'status' => $validated['status'],
+            'cancellation_source' => $validated['status'] === 'cancelled' ? 'staff' : null,
+        ];
 
         foreach (['tracking_number', 'shipping_note'] as $field) {
             if (array_key_exists($field, $validated)) {
                 $updates[$field] = $validated[$field];
             }
+        }
+
+        if ($validated['status'] === 'cancelled') {
+            $order->releaseStock('Order cancelled by staff');
         }
 
         $order->update($updates);

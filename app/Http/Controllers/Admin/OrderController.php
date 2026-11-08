@@ -10,7 +10,12 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $orders = Order::with('user');
+        $orders = Order::with('user')
+            ->where(function ($query): void {
+                $query->where('status', '!=', 'cancelled')
+                    ->orWhere('cancellation_source', '!=', 'customer')
+                    ->orWhereNull('cancellation_source');
+            });
 
         // SEARCH
         if ($request->search) {
@@ -44,7 +49,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('items.product', 'user');
+        $order->load('items.product.primaryImage', 'user');
         return view('admin.orders.show', compact('order'));
     }
 
@@ -60,12 +65,17 @@ class OrderController extends Controller
         $updates = [
             'status' => $validated['status'],
             'payment_status' => $validated['payment_status'],
+            'cancellation_source' => $validated['status'] === 'cancelled' ? 'admin' : null,
         ];
 
         foreach (['tracking_number', 'shipping_note'] as $field) {
             if (array_key_exists($field, $validated)) {
                 $updates[$field] = $validated[$field];
             }
+        }
+
+        if ($validated['status'] === 'cancelled') {
+            $order->releaseStock('Order cancelled by admin');
         }
 
         $order->update($updates);

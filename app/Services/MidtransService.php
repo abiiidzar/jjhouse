@@ -5,7 +5,9 @@ namespace App\Services;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class MidtransService
 {
@@ -29,7 +31,7 @@ class MidtransService
         Config::$is3ds = true;
     }
 
-    public function createTransaction($order, $items, $customerDetails)
+    public function createTransaction($order, $items, $customerDetails, string $paymentMethod = 'midtrans')
     {
         try {
             $orderId = preg_replace('/[^a-zA-Z0-9\-_~.]/', '-', $order->order_number);
@@ -53,17 +55,15 @@ class MidtransService
                     'email' => $customerDetails['email'] ?? '',
                     'phone' => $customerDetails['phone'] ?? '',
                 ],
-                'enabled_payments' => [
-                    'credit_card',
-                    'bank_transfer',
-                    'gopay',
-                    'shopeepay',
-                    'qris',
-                ],
                 'callbacks' => [
                     'finish' => route('dashboard'),
                 ],
             ];
+
+            $enabledPayments = $this->enabledPaymentsFor($paymentMethod);
+            if ($enabledPayments !== null) {
+                $params['enabled_payments'] = $enabledPayments;
+            }
 
             // Get Snap Token
             $snapToken = Snap::getSnapToken($params);
@@ -84,6 +84,109 @@ class MidtransService
             ]);
             return null;
         }
+    }
+
+    public function enabledPaymentsFor(string $paymentMethod): ?array
+    {
+        return match ($paymentMethod) {
+            'midtrans' => null,
+            'bank_transfer' => ['bank_transfer'],
+            'gopay' => ['gopay'],
+            'qris' => ['qris'],
+            default => throw new \InvalidArgumentException('Unsupported payment method.'),
+        };
+    }
+
+    public function cancelPendingTransaction(string $orderId): bool
+    {
+        $safeOrderId = rawurlencode($orderId);
+        $baseUrl = $this->isProduction
+            ? 'https://api.midtrans.com/v2/'
+            : 'https://api.sandbox.midtrans.com/v2/';
+
+        $statusResponse = Http::withBasicAuth($this->serverKey, '')
+            ->timeout(15)
+            ->get($baseUrl.$safeOrderId.'/status');
+
+        if ($statusResponse->status() === 404) {
+            return true;
+        }
+
+        if (!$statusResponse->successful()) {
+            Log::warning('Midtrans payment status could not be verified before retry', [
+                'http_status' => $statusResponse->status(),
+                'midtrans_status_code' => $statusResponse->json('status_code'),
+                'midtrans_status_message' => $statusResponse->json('status_message'),
+            ]);
+            throw new RuntimeException('Unable to verify the current Midtrans payment status.');
+        }
+
+        $status = $statusResponse->json('transaction_status');
+        if (!is_string($status) || $status === '') {
+            Log::warning('Midtrans returned no transaction status before retry', [
+                'http_status' => $statusResponse->status(),
+                'midtrans_status_code' => $statusResponse->json('status_code'),
+                'midtrans_status_message' => $statusResponse->json('status_message'),
+            ]);
+            throw new RuntimeException('Midtrans did not return a transaction status.');
+        }
+
+        if (in_array($status, ['cancel', 'expire', 'deny'], true)) {
+            return true;
+        }
+
+        if (in_array($status, ['settlement', 'capture', 'authorize', 'refund', 'partial_refund', 'chargeback', 'partial_chargeback'], true)) {
+            Log::warning('Midtrans transaction is not pending; replacement payment was blocked', [
+                'midtrans_order_id' => $orderId,
+                'transaction_status' => $status,
+            ]);
+            return false;
+        }
+
+        if ($status !== 'pending') {
+            Log::warning('Midtrans returned an unsupported transaction status before retry', [
+                'midtrans_order_id' => $orderId,
+                'transaction_status' => $status,
+            ]);
+            throw new RuntimeException('Midtrans returned an unsupported transaction status.');
+        }
+
+        $cancelResponse = Http::withBasicAuth($this->serverKey, '')
+            ->timeout(15)
+            ->post($baseUrl.$safeOrderId.'/cancel');
+
+        if ($cancelResponse->successful() && (string) $cancelResponse->json('status_code') === '200') {
+            return true;
+        }
+
+        $latestStatusResponse = Http::withBasicAuth($this->serverKey, '')
+            ->timeout(15)
+            ->get($baseUrl.$safeOrderId.'/status');
+
+        $latestStatus = $latestStatusResponse->successful()
+            ? $latestStatusResponse->json('transaction_status')
+            : null;
+
+        if (in_array($latestStatus, ['cancel', 'expire', 'deny'], true)) {
+            Log::warning('Midtrans cancellation response failed but the payment is now terminal', [
+                'http_status' => $cancelResponse->status(),
+                'midtrans_status_code' => $cancelResponse->json('status_code'),
+                'midtrans_status_message' => $cancelResponse->json('status_message'),
+                'latest_transaction_status' => $latestStatus,
+            ]);
+
+            return true;
+        }
+
+        Log::warning('Midtrans could not cancel the pending payment', [
+            'cancel_http_status' => $cancelResponse->status(),
+            'midtrans_status_code' => $cancelResponse->json('status_code'),
+            'midtrans_status_message' => $cancelResponse->json('status_message'),
+            'latest_status_http_status' => $latestStatusResponse->status(),
+            'latest_transaction_status' => $latestStatus,
+        ]);
+
+        throw new RuntimeException('Midtrans could not confirm cancellation of the previous payment.');
     }
 
     public function handleNotification()

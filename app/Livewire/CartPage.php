@@ -18,7 +18,7 @@ class CartPage extends Component
     public $selectedCity;
     public $selectedCityName;
     public $shippingCost = 0;
-    public $couriers = ['jne', 'tiki', 'pos'];
+    public $couriers = [];
     public $selectedCourier = 'jne';
     public $originCity = 495; // Jakarta Selatan
 
@@ -26,6 +26,7 @@ class CartPage extends Component
 
     public function mount()
     {
+        $this->couriers = config('shipping.couriers', []);
         $this->loadCart();
         $this->loadProvinces();
     }
@@ -76,9 +77,11 @@ class CartPage extends Component
         if ($this->selectedCity && $this->selectedCourier) {
             $rajaOngkir = new RajaOngkirService();
             $weight = $this->getTotalWeight();
-            $costs = $rajaOngkir->calculateCost($this->originCity, $this->selectedCity, $weight, $this->selectedCourier);
-            if (!empty($costs)) {
-                $this->shippingCost = $costs[0]['cost'][0]['value'];
+            $result = $rajaOngkir->calculateCost($this->originCity, $this->selectedCity, $weight, $this->selectedCourier);
+            if (!empty($result['success']) && !empty($result['data'])) {
+                $this->shippingCost = $result['data'][0]['costs'][0]['cost'][0]['value'] ?? 0;
+            } else {
+                $this->shippingCost = 0;
             }
         }
     }
