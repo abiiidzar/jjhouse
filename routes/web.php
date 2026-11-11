@@ -53,6 +53,11 @@ Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product
 
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::middleware('auth')->prefix('cart/items/{item}')->name('cart.items.')->group(function () {
+    Route::post('/increase', [CartController::class, 'increase'])->name('increase');
+    Route::post('/decrease', [CartController::class, 'decrease'])->name('decrease');
+    Route::delete('/', [CartController::class, 'remove'])->name('remove');
+});
 
 // subscribe dari frontend
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])

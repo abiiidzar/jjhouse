@@ -20,11 +20,46 @@ class OrderController extends Controller
             $this->syncPendingPayments();
         }
 
-        $orders = Auth::user()->orders()
+        $statusGroups = [
+            'all' => [],
+            'pending' => ['pending'],
+            'paid' => ['paid'],
+            'processing' => ['processing'],
+            'shipping' => ['ready_to_ship', 'shipped', 'delivered'],
+            'completed' => ['completed'],
+            'cancelled' => ['cancelled'],
+        ];
+        $activeStatus = $request->query('status', 'all');
+        if (!is_string($activeStatus) || !array_key_exists($activeStatus, $statusGroups)) {
+            $activeStatus = 'all';
+        }
+
+        $userOrders = Auth::user()->orders();
+        $statusCounts = (clone $userOrders)
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+        $tabCounts = [
+            'all' => $statusCounts->sum(),
+            'pending' => $statusCounts->get('pending', 0),
+            'paid' => $statusCounts->get('paid', 0),
+            'processing' => $statusCounts->get('processing', 0),
+            'shipping' => $statusCounts->only($statusGroups['shipping'])->sum(),
+            'completed' => $statusCounts->get('completed', 0),
+            'cancelled' => $statusCounts->get('cancelled', 0),
+        ];
+
+        $ordersQuery = $userOrders
             ->with('items.product.primaryImage', 'items.size')
-            ->latest()
-            ->paginate(10);
-        return view('dashboard.orders', compact('orders'));
+            ->latest();
+
+        if ($statusGroups[$activeStatus]) {
+            $ordersQuery->whereIn('status', $statusGroups[$activeStatus]);
+        }
+
+        $orders = $ordersQuery->paginate(10)->withQueryString();
+
+        return view('dashboard.orders', compact('orders', 'activeStatus', 'tabCounts'));
     }
 
     /**

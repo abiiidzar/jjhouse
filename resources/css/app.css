@@ -49,6 +49,13 @@
     transition: width 0.3s ease, margin 0.3s ease, padding 0.3s ease, border-width 0.3s ease, transform 0.3s ease;
 }
 
+[data-customer-account-panel] > [data-sidebar] {
+    margin-right: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
 @media (max-width: 1023px) {
     [data-customer-sidebar-layout] [data-sidebar] {
         position: fixed;
@@ -76,6 +83,10 @@
 }
 
 @media (min-width: 1024px) {
+    [data-customer-account-panel] > [data-sidebar] {
+        border-right: 1px solid rgb(243 244 246);
+    }
+
     [data-customer-sidebar-layout] [data-sidebar] {
         position: sticky;
         top: 6rem;

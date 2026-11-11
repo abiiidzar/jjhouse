@@ -19,24 +19,24 @@ class RajaOngkirService
     {
         // 🔥 PRIORITAS: Baca API key dari cache (diisi dari Admin Settings)
         // Fallback ke config (dari .env)
-        $this->apiKey = cache('shipping_rajaongkir_api_key') 
+        $this->apiKey = cache('shipping_rajaongkir_api_key')
             ?? config('services.rajaongkir.api_key');
-            
+
         $this->baseUrl = config('services.rajaongkir.base_url', 'https://rajaongkir.komerce.id/api/v1');
-        
+
         // 🔥 PRIORITAS: Baca origin city dari cache, fallback ke config
-        $this->originCity = cache('shipping_default_origin_city') 
+        $this->originCity = cache('shipping_default_origin_city')
             ?? config('services.rajaongkir.origin_city', 495);
-        
+
         // 🔥 Pre-load data kota lokal sekali di konstruktor agar getCityById() cepat
         // tanpa memicu panggilan API timeout
         $this->citiesData = $this->loadLocalCitiesData();
-        
+
         // Log untuk debugging (jangan log full API key)
         if (empty($this->apiKey)) {
             Log::warning('RajaOngkir API Key is EMPTY! Check .env or Admin Settings');
         } else {
-            Log::info('RajaOngkir API Key loaded from: ' . 
+            Log::info('RajaOngkir API Key loaded from: ' .
                 (cache('shipping_rajaongkir_api_key') ? 'cache (admin settings)' : 'config (.env)'));
         }
     }
@@ -84,7 +84,7 @@ class RajaOngkirService
     public function getProvinces()
     {
         $cacheKey = 'rajaongkir_provinces';
-        
+
         // 🔥 Cek cache dulu
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
@@ -124,7 +124,7 @@ class RajaOngkirService
     {
         // 🔥 Gunakan province_id langsung (data lokal sudah konsisten dengan penomoran API)
         $cacheKey = 'rajaongkir_cities_' . ($provinceId ?? 'all');
-        
+
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
@@ -141,7 +141,7 @@ class RajaOngkirService
     }
 
 
-    
+
     private function mergePostalCode($cities)
     {
         $localCities = $this->getLocalCities();
@@ -158,9 +158,9 @@ class RajaOngkirService
         return $cities;
     }
 
-    
 
-    
+
+
 
     /**
      * Get city by name with postal code
@@ -271,7 +271,7 @@ class RajaOngkirService
             ['city_id' => 154, 'city_name' => 'Jakarta Pusat', 'province_id' => 11, 'postal_code' => '10110'],
             ['city_id' => 155, 'city_name' => 'Jakarta Barat', 'province_id' => 11, 'postal_code' => '11110'],
             ['city_id' => 156, 'city_name' => 'Jakarta Utara', 'province_id' => 11, 'postal_code' => '14110'],
-            
+
             // Jawa Barat (province_id: 12)
             ['city_id' => 475, 'city_name' => 'Bandung', 'province_id' => 12, 'postal_code' => '40111'],
             ['city_id' => 476, 'city_name' => 'Bekasi', 'province_id' => 12, 'postal_code' => '17111'],
@@ -291,7 +291,7 @@ class RajaOngkirService
             ['city_id' => 490, 'city_name' => 'Purwakarta', 'province_id' => 12, 'postal_code' => '41111'],
             ['city_id' => 491, 'city_name' => 'Subang', 'province_id' => 12, 'postal_code' => '41211'],
             ['city_id' => 492, 'city_name' => 'Sumedang', 'province_id' => 12, 'postal_code' => '45311'],
-            
+
             // Sumatera Barat (province_id: 3)
             ['city_id' => 493, 'city_name' => 'Agam', 'province_id' => 3, 'postal_code' => '26411'],
             ['city_id' => 494, 'city_name' => 'Padang', 'province_id' => 3, 'postal_code' => '25111'],
@@ -316,7 +316,7 @@ class RajaOngkirService
     public function getCitiesWithPostalCode($provinceId = null)
     {
         $cities = $this->getCities($provinceId);
-        
+
         // Jika cities dari API tidak punya postal_code, ambil dari file lokal
         if (!empty($cities) && !isset($cities[0]['postal_code'])) {
             $localCities = $this->getLocalCities($provinceId);
@@ -331,7 +331,7 @@ class RajaOngkirService
                 }
             }
         }
-        
+
         return $cities;
     }
     public function calculateCost($origin, $destination, $weight, $courier)
@@ -368,10 +368,10 @@ class RajaOngkirService
                 ];
             }
 
-            $cacheKeys = [];
             $couriersToFetch = [];
             $costResults = [];
 
+            // 1. Cek cache per kurir terlebih dahulu
             foreach ($couriers as $code) {
                 $cacheKey = 'rajaongkir_cost_' . hash('sha256', implode('|', [
                     rtrim($this->baseUrl, '/'),
@@ -381,68 +381,64 @@ class RajaOngkirService
                     (int) $weight,
                     $code,
                 ]));
-                $cacheKeys[$code] = $cacheKey;
 
                 if (Cache::has($cacheKey)) {
                     $costResults = array_merge($costResults, Cache::get($cacheKey));
-                    continue;
+                } else {
+                    $couriersToFetch[$code] = $cacheKey;
                 }
-
-                $couriersToFetch[] = $code;
             }
 
-            $responses = Http::pool(function (Pool $pool) use ($couriersToFetch, $originId, $destinationId, $weight) {
-                foreach ($couriersToFetch as $code) {
-                    $pool->as($code)
-                        ->asForm()
-                        ->acceptJson()
-                        ->timeout($this->timeout)
-                        ->withHeaders(['key' => $this->apiKey])
-                        ->post(rtrim($this->baseUrl, '/') . '/calculate/domestic-cost', [
-                            'origin' => $originId,
-                            'destination' => $destinationId,
-                            'weight' => $weight,
-                            'courier' => $code,
-                        ]);
-                }
-            }, concurrency: 5);
-
-            $apiErrors = [];
-
-            foreach ($responses as $code => $response) {
-                if ($response instanceof \Throwable) {
-                    $apiErrors[] = $response->getMessage();
-                    Log::warning('RajaOngkir courier request failed', [
-                        'courier' => $code,
-                        'error' => $response->getMessage(),
+            // 2. Jika ada kurir yang belum di-cache, tembak dalam 1 REQUEST saja
+            if (!empty($couriersToFetch)) {
+                $response = Http::asForm()
+                    ->acceptJson()
+                    ->timeout($this->timeout)
+                    ->withHeaders(['key' => $this->apiKey])
+                    ->post(rtrim($this->baseUrl, '/') . '/calculate/domestic-cost', [
+                        'origin'      => $originId,
+                        'destination' => $destinationId,
+                        'weight'      => $weight,
+                        'courier'     => implode(':', array_keys($couriersToFetch)),
                     ]);
-                    continue;
-                }
 
                 $result = $response->json() ?? [];
                 $apiStatus = $result['meta'] ?? [];
 
                 if (!$response->successful() || (int) ($apiStatus['code'] ?? 0) !== 200) {
                     $message = $apiStatus['message'] ?? 'Gagal mendapatkan ongkir dari RajaOngkir';
-                    $apiErrors[] = $message;
-                    Log::warning('RajaOngkir cost request failed', [
-                        'courier' => $code,
+                    Log::warning('RajaOngkir cost request failed, switching to local fallback', [
                         'http_status' => $response->status(),
                         'api_message' => $message,
                     ]);
-                    continue;
-                }
 
-                $data = $result['data'] ?? [];
-                Cache::put($cacheKeys[$code], $data, now()->addHours(6));
-                $costResults = array_merge($costResults, $data);
+                    // Otomatis fallback ke tarif lokal jika limit habis / server error
+                    if (empty($costResults)) {
+                        return $this->calculateCostLocal($origin, $destination, $weight, $courier);
+                    }
+                } else {
+                    $fetchedData = $result['data'] ?? [];
+
+                    // Kelompokkan hasil berdasarkan kode kurir untuk disimpan ke cache masing-masing
+                    $groupedByCourier = [];
+                    foreach ($fetchedData as $item) {
+                        $cCode = strtolower($item['code'] ?? '');
+                        if ($cCode !== '') {
+                            $groupedByCourier[$cCode][] = $item;
+                        }
+                    }
+
+                    foreach ($couriersToFetch as $code => $cKey) {
+                        $dataToCache = $groupedByCourier[$code] ?? [];
+                        Cache::put($cKey, $dataToCache, now()->addHours(6));
+                        $costResults = array_merge($costResults, $dataToCache);
+                    }
+                }
             }
 
+            // 3. Jika seluruh hasil kosong, gunakan estimasi lokal
             if (empty($costResults)) {
-                return [
-                    'success' => false,
-                    'message' => $apiErrors[0] ?? 'Tidak ada layanan kurir untuk rute ini',
-                ];
+                return $this->calculateCostLocal($origin, $destination, $weight, $courier);
             }
 
             return [
@@ -630,28 +626,28 @@ class RajaOngkirService
     public function calculateCostLocal($origin, $destination, $weight, $courier = null)
     {
         Log::info("RajaOngkir using LOCAL fallback for cost (origin: {$origin}, dest: {$destination}, weight: {$weight}g)");
-        
+
         // Ambil nama kota tujuan untuk estimasi
         $destCity = $this->getCityById($destination);
         $destName = $destCity['city_name'] ?? 'Kota Tujuan';
         $destProvinceId = $destCity['province_id'] ?? null;
-        
+
         // Ambil nama kota asal
         $originCity = $this->getCityById($origin);
         $originName = $originCity['city_name'] ?? 'Kota Asal';
         $originProvinceId = $originCity['province_id'] ?? null;
-        
+
         // Tentukan zona berdasarkan provinsi
         // DKI Jakarta=11, Jawa Barat=12, Jawa Tengah=13, Jawa Timur=15, Banten=16, DI Yogyakarta=14
-        $jawaIds = [11, 12, 13, 14, 15, 16]; 
+        $jawaIds = [11, 12, 13, 14, 15, 16];
         // Sumatera Barat=3, Sumatera Utara=2, Sumatera Selatan=6, Riau=4, Jambi=5, Lampung=8, Aceh=1, Bengkulu=7, Kep Bangka Belitung=9, Kep Riau=10
-        $sumateraIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; 
-        
+        $sumateraIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
         $isJawa = in_array($destProvinceId, $jawaIds);
         $isSumatera = in_array($destProvinceId, $sumateraIds);
         $isOriginJawa = in_array($originProvinceId, $jawaIds);
         $isOriginSumatera = in_array($originProvinceId, $sumateraIds);
-        
+
         // Tentukan kategori jarak
         if ($isOriginJawa && $isJawa) {
             $zone = 'jawa_jawa'; // Dalam Pulau Jawa
@@ -662,7 +658,7 @@ class RajaOngkirService
         } else {
             $zone = 'antar_pulau'; // Antar pulau lainnya
         }
-        
+
         // Tarif dasar per kg (dalam Rupiah) per zona
         $rates = [
             'jawa_jawa' => [
@@ -686,32 +682,32 @@ class RajaOngkirService
                 'pos' => ['base' => 25000, 'per_kg' => 10000, 'etd' => '4-8'],
             ],
         ];
-        
+
         // Normalisasi weight ke kg (minimal 1kg)
         $weightKg = max(1, ceil($weight / 1000));
-        
+
         // Parse courier list
         $couriers = array_filter(array_map('trim', explode(',', $courier)));
         if (empty($couriers)) {
             $couriers = config('shipping.couriers', ['jne', 'sicepat', 'ide', 'sap', 'jnt', 'ninja', 'tiki', 'lion', 'anteraja', 'pos', 'ncs', 'rex', 'rpx', 'sentral', 'star', 'wahana', 'spx']);
         }
-        
+
         $courierNames = [
             'jne' => 'Jalur Nugraha Ekakurir (JNE)',
             'tiki' => 'Citra Van Titipan Kilat (TIKI)',
             'pos' => 'POS Indonesia (POS)',
         ];
-        
+
         $results = [];
         foreach ($couriers as $c) {
             $c = strtolower($c);
             if (!isset($rates[$zone][$c])) {
                 continue;
             }
-            
+
             $rate = $rates[$zone][$c];
             $totalCost = $rate['base'] + ($rate['per_kg'] * ($weightKg - 1));
-            
+
             $costs = [
                 [
                     'service' => 'REG',
@@ -721,7 +717,7 @@ class RajaOngkirService
                     ],
                 ],
             ];
-            
+
             // Tambahkan opsi OKE (ekonomis) untuk JNE
             if ($c == 'jne') {
                 $okeCost = $rate['base'] - 2000 + ($rate['per_kg'] * ($weightKg - 1));
@@ -733,21 +729,21 @@ class RajaOngkirService
                     ],
                 ];
             }
-            
+
             $results[] = [
                 'code' => $c,
                 'name' => $courierNames[$c] ?? strtoupper($c),
                 'costs' => $costs,
             ];
         }
-        
+
         if (empty($results)) {
             return [
                 'success' => false,
                 'message' => 'Tidak ada kurir yang tersedia untuk rute ini'
             ];
         }
-        
+
         return [
             'success' => true,
             'data' => $results,

@@ -30,6 +30,11 @@
                     <div class="w-28 h-28 bg-gray-100 overflow-hidden">
                         @if($item->product->primaryImage)
                             <img src="{{ $item->product->primaryImage->image_path }}"
+                                 alt="{{ $item->product->name }}"
+                                 width="112"
+                                 height="112"
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-full object-cover">
                         @endif
                     </div>
@@ -56,30 +61,43 @@
 
                             <!-- QTY -->
                             <div class="flex items-center border">
+                                <form method="POST" action="{{ route('cart.items.decrease', $item->id) }}">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        aria-label="Decrease quantity of {{ $item->product->name }}"
+                                        @disabled($item->quantity <= 1)
+                                        class="px-3 py-2 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black disabled:cursor-not-allowed disabled:opacity-40"
+                                    >−</button>
+                                </form>
 
-                                <button
-                                    wire:click="decrease({{ $item->id }})"
-                                    class="px-3 py-2 hover:bg-gray-100"
-                                >−</button>
-
-                                <span class="px-4 text-sm">
+                                <span class="min-w-12 px-4 text-center text-sm tabular-nums" aria-live="polite">
                                     {{ $item->quantity }}
                                 </span>
 
-                                <button
-                                    wire:click="increase({{ $item->id }})"
-                                    class="px-3 py-2 hover:bg-gray-100"
-                                >+</button>
+                                <form method="POST" action="{{ route('cart.items.increase', $item->id) }}">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        aria-label="Increase quantity of {{ $item->product->name }}"
+                                        @disabled($item->quantity >= 99)
+                                        class="px-3 py-2 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black disabled:cursor-not-allowed disabled:opacity-40"
+                                    >+</button>
+                                </form>
 
                             </div>
 
                             <!-- REMOVE -->
-                            <button
-                                wire:click="removeItem({{ $item->id }})"
-                                class="text-xs uppercase tracking-widest text-gray-400 hover:text-black"
-                            >
-                                Remove
-                            </button>
+                            <form method="POST" action="{{ route('cart.items.remove', $item->id) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button
+                                    type="submit"
+                                    class="text-xs uppercase tracking-widest text-gray-400 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                                >
+                                    Remove
+                                </button>
+                            </form>
 
                         </div>
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
 use App\Models\Setting;
 
 class LoginController extends Controller
@@ -48,7 +49,19 @@ class LoginController extends Controller
                 return redirect()->route('kasir.dashboard');
             }
 
-            return redirect()->route('dashboard');
+            $returnProduct = $request->input('return_product');
+            if (is_string($returnProduct)) {
+                $product = Product::query()
+                    ->where('slug', $returnProduct)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($product) {
+                    return redirect()->route('product.show', $product->slug);
+                }
+            }
+
+            return redirect()->intended(route('dashboard'));
         }
 
         return back()->withErrors([

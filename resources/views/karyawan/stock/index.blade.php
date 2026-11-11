@@ -65,7 +65,7 @@
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
                                 @if($product->primaryImage)
-                                <img src="{{ $product->primaryImage->image_path }}" alt="{{ $product->name }}" class="w-10 h-10 rounded object-cover">
+                                <img src="{{ $product->primaryImage->image_path }}" alt="{{ $product->name }}" loading="lazy" decoding="async" class="w-10 h-10 rounded object-cover">
                                 @else
                                 <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center">📷</div>
                                 @endif

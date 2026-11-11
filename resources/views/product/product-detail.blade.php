@@ -15,10 +15,13 @@
             <div class="aspect-square bg-gray-100 overflow-hidden">
                 @if($product->primaryImage)
                     <img src="{{ $product->primaryImage->image_path }}"
+                         alt="{{ $product->name }}"
+                         fetchpriority="high"
+                         decoding="async"
                          class="w-full h-full object-cover">
                 @else
                     <div class="w-full h-full flex items-center justify-center text-gray-300 text-5xl">
-                        <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-6 h-6">
+                        <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                     </div>
                 @endif
             </div>
@@ -80,6 +83,9 @@
 
                 @if($item->primaryImage)
                     <img src="{{ $item->primaryImage->image_path }}"
+                         alt="{{ $item->name }}"
+                         loading="lazy"
+                         decoding="async"
                          class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
                 @endif
 

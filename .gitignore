@@ -24,3 +24,67 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+
+# ==========================================
+# LOCAL ENVIRONMENT & SECRETS
+# ==========================================
+.env.*
+!.env.example
+!.env.testing.example
+
+# ==========================================
+# DATABASE BACKUP & DUMP
+# ==========================================
+/backup/
+*.sql
+*.sql.gz
+*.dump
+*.backup
+
+# ==========================================
+# DATABASE MIGRATION TEMPORARY FILES
+# ==========================================
+/database/migrations_backup/
+/database/scripts/transfer-mysql-to-pgsql.php
+/database/scripts/check-postgresql-data.php
+/database/scripts/inspect-newsletter-columns.php
+
+# ==========================================
+# TEMPORARY DATABASE STRUCTURE EXPORTS
+# ==========================================
+struktur_mysql.txt
+struktur_postgresql.txt
+
+# ==========================================
+# PHP & LARAVEL TEMPORARY FILES
+# ==========================================
+.phpunit.cache/
+.phpunit-watcher.yml
+.phpunit.result.cache
+.phpstan/
+.php-cs-fixer.cache
+
+# ==========================================
+# TEMPORARY EXPORTS & GENERATED FILES
+# ==========================================
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/bootstrap/cache/*.php
+
+# ==========================================
+# LOCAL DATABASE FILES
+# ==========================================
+*.sqlite
+*.sqlite3
+*.db
+
+# ==========================================
+# TEMPORARY FILES
+# ==========================================
+*.tmp
+*.temp
+*.bak
+*.old

@@ -209,7 +209,7 @@
                 <div class="flex gap-4">
                     <div class="w-16 h-16 bg-gray-200 rounded overflow-hidden relative">
                         @if($item->product->primaryImage)
-                        <img src="{{ $item->product->primaryImage->image_path }}" class="w-full h-full object-cover">
+                        <img src="{{ $item->product->primaryImage->image_path }}" alt="{{ $item->product->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                         @endif
                         <span class="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                             {{ $item->quantity }}

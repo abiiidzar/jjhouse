@@ -38,7 +38,7 @@
                 <div class="col-md-4 mb-4">
                     <div class="card product-card">
                         @if($product->primaryImage)
-                            <img src="{{ $product->primaryImage->path }}" class="card-img-top" alt="{{ $product->name }}">
+                            <img src="{{ $product->primaryImage->path }}" class="card-img-top" alt="{{ $product->name }}" loading="lazy" decoding="async">
                         @endif
                         <div class="card-body">
                             <h5 class="card-title">{{ $product->name }}</h5>

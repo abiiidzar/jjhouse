@@ -37,7 +37,7 @@
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-gray-100 rounded overflow-hidden">
                                 @if($post->featured_image)
-                                <img src="{{ $post->featured_image }}" class="w-full h-full object-cover">
+                                <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                 @endif
                             </div>
                             <div>

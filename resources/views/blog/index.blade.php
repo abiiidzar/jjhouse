@@ -23,6 +23,8 @@
                         <div class="overflow-hidden rounded-lg mb-4">
                             <img src="{{ $post->featured_image ?? 'https://placehold.co/800x500' }}"
                                  alt="{{ $post->title }}"
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition duration-500">
                         </div>
                         <div class="space-y-2">
@@ -95,7 +97,7 @@
                     @foreach($recentPosts as $recent)
                     <a href="{{ route('blog.show', $recent->slug) }}" class="flex gap-3 group">
                         <div class="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                            <img src="{{ $recent->featured_image ?? 'https://placehold.co/100x100' }}" class="w-full h-full object-cover">
+                            <img src="{{ $recent->featured_image ?? 'https://placehold.co/100x100' }}" alt="{{ $recent->title }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                         </div>
                         <div>
                             <h4 class="font-medium text-sm group-hover:text-gray-600 line-clamp-2">{{ $recent->title }}</h4>

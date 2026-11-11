@@ -55,10 +55,12 @@
                         @if ($product->primaryImage)
                             <img src="{{ $product->primaryImage->image_path }}"
                                  alt="{{ $product->name }}"
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-20 object-cover">
                         @else
                             <div class="w-full h-20 bg-gray-200 flex items-center justify-center">
-                                <span class="text-2xl"><img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-6 h-6"></span>
+                                <span class="text-2xl"><img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6"></span>
                             </div>
                         @endif
                         {{-- Check badge --}}
@@ -104,10 +106,12 @@
                             @if ($product->primaryImage)
                                 <img src="{{ $product->primaryImage->image_path }}"
                                      alt="{{ $product->name }}"
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-24 object-cover">
                             @else
                                 <div class="w-full h-24 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-6 h-6">
+                                    <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                                 </div>
                             @endif
 
@@ -293,7 +297,7 @@
                             @php $markedForDelete = in_array($img->id, $deleteImageIds); @endphp
                             <div class="relative group w-24 h-24 rounded-lg overflow-hidden border-2
                                 {{ $markedForDelete ? 'border-red-400 opacity-50' : ($img->is_primary ? 'border-blue-400' : 'border-gray-200') }}">
-                                <img src="{{ $img->image_path }}" alt="img" class="w-full h-full object-cover">
+                                <img src="{{ $img->image_path }}" alt="{{ $editProduct->name }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
 
                                 @if ($img->is_primary)
                                     <div class="absolute bottom-0 left-0 right-0 bg-blue-500/80 text-white text-[9px] text-center py-0.5 font-bold">UTAMA</div>

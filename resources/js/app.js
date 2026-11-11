@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const notificationPollers = new Map();
+
     document.querySelectorAll('[data-notification-bell]').forEach((bell) => {
         const trigger = bell.querySelector('[data-notification-trigger]');
         const panel = bell.querySelector('[data-notification-panel]');
@@ -43,31 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         };
 
-        const refreshUnreadCount = async () => {
-            if (!pollUrl || document.hidden) {
-                return;
-            }
-
-            try {
-                const response = await fetch(pollUrl, {
-                    credentials: 'same-origin',
-                    headers: {
-                        Accept: 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                });
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const payload = await response.json();
-                setUnreadCount(payload.count);
-            } catch {
-                // Polling bersifat tambahan; jangan mengganggu halaman bila koneksi gagal.
-            }
-        };
-
         trigger.addEventListener('click', () => {
             setOpen(panel.classList.contains('hidden'));
         });
@@ -86,14 +63,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (pollUrl) {
-            window.setInterval(refreshUnreadCount, 60_000);
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    refreshUnreadCount();
-                }
-            });
+            const listeners = notificationPollers.get(pollUrl) ?? new Set();
+            listeners.add(setUnreadCount);
+            notificationPollers.set(pollUrl, listeners);
         }
     });
+
+    const refreshUnreadCount = async (pollUrl, listeners) => {
+        if (document.hidden) {
+            return;
+        }
+
+        try {
+            const response = await fetch(pollUrl, {
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json();
+            listeners.forEach((setUnreadCount) => setUnreadCount(payload.count));
+        } catch {
+            // Polling bersifat tambahan; jangan mengganggu halaman bila koneksi gagal.
+        }
+    };
+
+    notificationPollers.forEach((listeners, pollUrl) => {
+        window.setInterval(() => refreshUnreadCount(pollUrl, listeners), 60_000);
+    });
+
+    if (notificationPollers.size > 0) {
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                notificationPollers.forEach((listeners, pollUrl) => {
+                    refreshUnreadCount(pollUrl, listeners);
+                });
+            }
+        });
+    }
 
     document.querySelectorAll('[data-sidebar-layout]').forEach((layout, index) => {
         const sidebar = layout.querySelector('[data-sidebar]');

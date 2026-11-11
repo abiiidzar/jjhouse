@@ -11,7 +11,9 @@ class ProductController extends Controller
     // Di ShopController atau controller produk Anda
     public function index(Request $request)
     {
-        $query = Product::query();
+        $query = Product::query()
+            ->where('is_active', true)
+            ->with('primaryImage');
 
         // Filter kategori
         if ($request->has('category') && $request->category != '') {

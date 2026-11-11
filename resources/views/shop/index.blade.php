@@ -79,10 +79,11 @@
                 @if($product->primaryImage)
                     <img src="{{ $product->primaryImage->image_path }}"
                          class="w-full h-full object-cover transition duration-700 group-hover:scale-105"
-                         loading="lazy">
+                         loading="lazy"
+                         decoding="async">
                 @else
                     <div class="w-full h-full flex items-center justify-center text-gray-300 text-3xl">
-                        <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-16 sm:w-20 md:w-30 h-16 sm:h-20 md:h-30 object-cover transition duration-700 group-hover:scale-105">
+                        <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-16 sm:w-20 md:w-30 h-16 sm:h-20 md:h-30 object-cover transition duration-700 group-hover:scale-105">
                     </div>
                 @endif
 

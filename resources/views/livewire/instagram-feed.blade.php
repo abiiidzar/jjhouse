@@ -13,7 +13,7 @@
                         <div class="col-md-4 mb-3">
                             <div class="instagram-item">
                                 @if(isset($feed['media_type']) && $feed['media_type'] === 'IMAGE')
-                                    <img src="{{ $feed['media_url'] ?? '' }}" alt="Instagram Post" class="img-fluid">
+                                    <img src="{{ $feed['media_url'] ?? '' }}" alt="Instagram Post" loading="lazy" decoding="async" class="img-fluid">
                                 @elseif(isset($feed['media_type']) && in_array($feed['media_type'], ['VIDEO', 'CAROUSEL']))
                                     <video class="img-fluid" controls>
                                         <source src="{{ $feed['media_url'] ?? '' }}" type="video/mp4">

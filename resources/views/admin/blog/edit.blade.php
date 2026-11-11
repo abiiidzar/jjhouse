@@ -43,7 +43,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Current Image</label>
                         @if($post->featured_image)
-                        <img src="{{ $post->featured_image }}" class="w-full h-32 object-cover rounded mb-2">
+                        <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" loading="lazy" decoding="async" class="w-full h-32 object-cover rounded mb-2">
                         @endif
                         <input type="file" name="featured_image" accept="image/*" class="w-full border border-gray-300 rounded-md px-3 py-2">
                     </div>

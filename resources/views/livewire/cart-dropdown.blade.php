@@ -16,6 +16,8 @@
                     <div class="w-14 h-14 bg-gray-100">
                         @if($item->product->primaryImage)
                             <img src="{{ $item->product->primaryImage->image_path }}"
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-full object-cover">
                         @endif
                     </div>

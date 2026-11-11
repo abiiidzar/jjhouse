@@ -149,6 +149,8 @@
                                 <div class="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                                     @if($item->product->primaryImage)
                                         <img src="{{ $item->product->primaryImage->image_path }}"
+                                             loading="lazy"
+                                             decoding="async"
                                              class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full bg-gray-200"></div>
@@ -240,6 +242,8 @@
                         <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                             @if($item->product->primaryImage)
                                 <img src="{{ $item->product->primaryImage->image_path }}"
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">

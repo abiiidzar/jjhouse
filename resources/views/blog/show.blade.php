@@ -29,7 +29,7 @@
     <!-- Featured Image -->
     @if($post->featured_image)
     <div class="mb-8 rounded-xl overflow-hidden">
-        <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full">
+        <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" fetchpriority="high" decoding="async" class="w-full">
     </div>
     @endif
 
@@ -67,7 +67,7 @@
             @foreach($relatedPosts as $related)
             <a href="{{ route('blog.show', $related->slug) }}" class="group">
                 <div class="overflow-hidden rounded-lg mb-3">
-                    <img src="{{ $related->featured_image ?? 'https://placehold.co/400x300' }}" class="w-full h-40 object-cover group-hover:scale-105 transition">
+                    <img src="{{ $related->featured_image ?? 'https://placehold.co/400x300' }}" alt="{{ $related->title }}" loading="lazy" decoding="async" class="w-full h-40 object-cover group-hover:scale-105 transition">
                 </div>
                 <h4 class="font-medium group-hover:text-gray-600">{{ $related->title }}</h4>
                 <p class="text-sm text-gray-500">{{ $related->published_at->format('M d, Y') }}</p>

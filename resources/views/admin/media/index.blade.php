@@ -35,7 +35,7 @@
                     <div>
                         <p class="font-semibold text-gray-700 mb-3">Current Image</p>
                         <div class="bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
-                            <img src="{{ $homeImages['hero_image'] }}" alt="Hero Image" class="w-full h-64 object-cover">
+                            <img src="{{ $homeImages['hero_image'] }}" alt="Hero Image" loading="lazy" decoding="async" class="w-full h-64 object-cover">
                         </div>
                     </div>
 
@@ -93,6 +93,8 @@
                     <!-- PREVIEW -->
                     <div class="bg-gray-200 rounded mb-3 overflow-hidden">
                         <img src="{{ $homeImages[$imageKey] ?? '' }}"
+                            loading="lazy"
+                            decoding="async"
                             class="w-full h-40 object-cover">
                     </div>
 
@@ -130,7 +132,7 @@
                     <div>
                         <p class="font-semibold text-gray-700 mb-3">Current Image</p>
                         <div class="bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
-                            <img src="{{ $homeImages['story_image'] }}" alt="Story Image" class="w-full h-64 object-cover">
+                            <img src="{{ $homeImages['story_image'] }}" alt="Story Image" loading="lazy" decoding="async" class="w-full h-64 object-cover">
                         </div>
                     </div>
 
@@ -264,7 +266,7 @@
                         <div class="mb-4">
                             <p class="font-semibold text-gray-700 mb-2">Editorial Image {{ $position }}</p>
                             <div class="bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300 h-48">
-                                <img src="{{ $homeImages['editorial_image_' . $position] }}" alt="Editorial {{ $position }}" class="w-full h-full object-cover">
+                                <img src="{{ $homeImages['editorial_image_' . $position] }}" alt="Editorial {{ $position }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
                             </div>
                         </div>
 

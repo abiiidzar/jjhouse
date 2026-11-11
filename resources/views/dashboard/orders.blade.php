@@ -4,15 +4,45 @@
 
 @section('content')
 <div data-theme="light" class="container mx-auto px-4 pt-24 pb-8 md:pt-28 md:pb-12">
-    <div data-sidebar-layout data-customer-sidebar-layout data-sidebar-key="customer-dashboard" data-sidebar-desktop-breakpoint="1024" data-sidebar-lock-scroll class="relative flex flex-col items-start lg:flex-row">
+    <div data-sidebar-layout data-customer-sidebar-layout data-customer-account-panel data-sidebar-key="customer-dashboard" data-sidebar-desktop-breakpoint="1024" data-sidebar-lock-scroll class="relative flex flex-col items-start rounded-xl border border-gray-100 bg-white shadow-sm lg:flex-row lg:items-stretch">
         <div data-sidebar-overlay aria-hidden="true"></div>
         @include('dashboard.sidebar')
 
-        <div class="w-full min-w-0 flex-1 lg:w-auto">
+        <div class="w-full min-w-0 flex-1 p-4 sm:p-6 lg:w-auto lg:p-8">
             <div class="mb-6 flex items-center gap-3">
                 <x-dashboard-sidebar-toggle />
                 <h1 class="text-2xl font-bold">My Orders</h1>
             </div>
+
+            @php
+                $orderTabs = [
+                    'all' => 'All',
+                    'pending' => 'Awaiting payment',
+                    'paid' => 'Paid',
+                    'processing' => 'Processing',
+                    'shipping' => 'In delivery',
+                    'completed' => 'Completed',
+                    'cancelled' => 'Cancelled',
+                ];
+            @endphp
+            <nav aria-label="Filter orders by status" class="mb-6 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <div class="flex min-w-max border-b border-gray-200">
+                    @foreach($orderTabs as $status => $label)
+                        <a href="{{ route('dashboard', ['status' => $status]) }}"
+                           @if($activeStatus === $status) aria-current="page" @endif
+                           class="inline-flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm transition
+                               {{ $activeStatus === $status
+                                   ? 'border-black font-semibold text-black'
+                                   : 'border-transparent text-gray-600 hover:border-gray-300 hover:text-black' }}
+                               focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black">
+                            {{ $label }}
+                            <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs tabular-nums text-gray-600">
+                                {{ $tabCounts[$status] }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </nav>
 
             @if($orders->count() > 0)
                 <div class="space-y-4">
@@ -38,9 +68,11 @@
                                     @elseif($order->status == 'processing') bg-indigo-100 text-indigo-800
                                     @elseif($order->status == 'shipped') bg-purple-100 text-purple-800
                                     @elseif($order->status == 'completed') bg-green-100 text-green-800
+                                    @elseif($order->status == 'ready_to_ship') bg-teal-100 text-teal-800
+                                    @elseif($order->status == 'delivered') bg-green-100 text-green-800
                                     @else bg-red-100 text-red-800
                                     @endif">
-                                    {{ ucfirst($order->status) }}
+                                    {{ $order->status_label }}
                                 </span>
                             </div>
                             <a href="{{ route('dashboard.order', $order) }}" class="text-sm text-gray-600 hover:text-black underline">View Details →</a>
@@ -53,6 +85,11 @@
                                     <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
                                         @if($item->product->primaryImage)
                                             <img src="{{ $item->product->primaryImage->image_path }}"
+                                                 alt="{{ $item->product->name }}"
+                                                 width="48"
+                                                 height="48"
+                                                 loading="lazy"
+                                                 decoding="async"
                                                  class="w-full h-full object-cover">
                                         @else
                                             <div class="w-full h-full bg-gray-100"></div>
@@ -83,9 +120,15 @@
                     <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    <h3 class="text-lg font-medium mb-2">No orders yet</h3>
-                    <p class="text-gray-500 mb-4">You haven't placed any orders yet.</p>
-                    <a href="{{ route('shop') }}" class="inline-block bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Start Shopping</a>
+                    @if($activeStatus === 'all')
+                        <h3 class="text-lg font-medium mb-2">No orders yet</h3>
+                        <p class="text-gray-500 mb-4">You haven't placed any orders yet.</p>
+                        <a href="{{ route('shop') }}" class="inline-block bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Start Shopping</a>
+                    @else
+                        <h3 class="text-lg font-medium mb-2">No {{ strtolower($orderTabs[$activeStatus]) }} orders</h3>
+                        <p class="text-gray-500 mb-4">There are no orders in this status.</p>
+                        <a href="{{ route('dashboard') }}" class="inline-block border border-gray-300 px-6 py-2 rounded-md hover:border-black transition">View all orders</a>
+                    @endif
                 </div>
             @endif
         </div>

@@ -128,6 +128,8 @@
                             id="img-wrapper-{{ $image->id }}">
                             <img src="{{ $image->image_path }}"
                                  alt="{{ $product->name }}"
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-20 object-cover">
                             @if($image->is_primary)
                             <div class="absolute bottom-0 left-0 right-0 bg-blue-500/80 text-white text-[9px] text-center py-0.5 font-bold">

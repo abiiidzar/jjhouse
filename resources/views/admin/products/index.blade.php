@@ -101,6 +101,8 @@
                                 @if($product->primaryImage)
                                     <img src="{{ $product->primaryImage->image_path }}"
                                          alt="{{ $product->name }}"
+                                         loading="lazy"
+                                         decoding="async"
                                          class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300 text-lg">

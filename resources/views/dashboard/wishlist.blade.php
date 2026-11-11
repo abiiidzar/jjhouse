@@ -26,6 +26,8 @@
                             <div class="overflow-hidden">
                                 <img src="{{ $wishlist->product->primaryImage->image_path ?? 'https://placehold.co/400x500' }}"
                                      alt="{{ $wishlist->product->name }}"
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-64 object-cover group-hover:scale-105 transition duration-500">
                             </div>
                         </a>

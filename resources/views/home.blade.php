@@ -42,7 +42,14 @@
                 style="clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
                         z-index: {{ 10 - $index }}">
 
-                <img src="{{ $img }}" class="w-full h-full object-cover">
+                <img
+                    src="{{ $img }}"
+                    alt="JJHOUSE collection"
+                    loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                    fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}"
+                    decoding="async"
+                    class="w-full h-full object-cover"
+                >
 
                 <div class="absolute inset-0 bg-black/40"></div>
 
@@ -115,6 +122,8 @@
                 <div>
                     <img src="{{ $homeImages['story_image'] }}"
                          alt="Story Image"
+                         loading="lazy"
+                         decoding="async"
                          class="w-full rounded-lg shadow-lg object-cover h-[500px]">
                 </div>
 
@@ -150,10 +159,13 @@
                             <div class="relative overflow-hidden">
                                 @if($product->primaryImage)
                                     <img src="{{ $product->primaryImage->image_path }}"
+                                        alt="{{ $product->name }}"
+                                        loading="lazy"
+                                        decoding="async"
                                         class="w-[300px] h-[300px] object-cover transition duration-700 group-hover/item:scale-105">
                                 @else
                                     <div class="w-full h-[300px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                         <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-6 h-6">
+                                         <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                                     </div>
                                 @endif
                             </div>
@@ -175,10 +187,10 @@
                     <div class="min-w-[250px]">
                         <a href="{{ route('product.show', $product->slug) }}">
                             @if($product->primaryImage)
-                                <img src="{{ $product->primaryImage->image_path }}" class="w-full h-[300px] object-cover">
+                                <img src="{{ $product->primaryImage->image_path }}" alt="{{ $product->name }}" loading="lazy" decoding="async" class="w-full h-[300px] object-cover">
                             @else
                                 <div class="w-full h-[300px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                    <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-6 h-6">
+                                    <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                                 </div>
                             @endif
                         </a>
@@ -211,13 +223,13 @@
 
             <!-- LEFT BIG -->
             <div>
-                <img src="{{ $homeImages['editorial_image_1'] }}" class="w-full h-[500px] object-cover">
+                <img src="{{ $homeImages['editorial_image_1'] }}" loading="lazy" decoding="async" class="w-full h-[500px] object-cover">
                 <p class="mt-3 text-xs uppercase">Our Products</p>
             </div>
 
             <!-- MIDDLE -->
             <div>
-                <img src="{{ $homeImages['editorial_image_2'] }}" class="w-full h-[500px] object-cover">
+                <img src="{{ $homeImages['editorial_image_2'] }}" loading="lazy" decoding="async" class="w-full h-[500px] object-cover">
                 <p class="mt-3 text-xs uppercase flex justify-between">
                     About Us <span>Read More</span>
                 </p>
@@ -225,7 +237,7 @@
 
             <!-- RIGHT -->
             <div>
-                <img src="{{ $homeImages['editorial_image_3'] }}" class="w-full h-[500px] object-cover">
+                <img src="{{ $homeImages['editorial_image_3'] }}" loading="lazy" decoding="async" class="w-full h-[500px] object-cover">
                 <p class="mt-3 text-xs uppercase">Community</p>
             </div>
 

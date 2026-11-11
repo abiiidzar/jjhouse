@@ -69,7 +69,7 @@
             <form method="POST" action="{{ route('login') }}" class="space-y-4 md:space-y-6">
                 @csrf
 
-                <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+                <input type="hidden" name="return_product" value="{{ request('return_product') }}">
 
                 <!-- EMAIL -->
                 <div>

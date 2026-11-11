@@ -26,7 +26,11 @@ class AddToCartButton extends Component
     public function addToCart()
     {
         if (!Auth::check()) {
-            return redirect()->route('login');
+            session()->put('url.intended', route('product.show', $this->product->slug));
+
+            return redirect()->route('login', [
+                'return_product' => $this->product->slug,
+            ]);
         }
 
         if (!$this->selectedSize) {
