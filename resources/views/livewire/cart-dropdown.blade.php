@@ -30,8 +30,9 @@
                     </div>
 
                     <button wire:click="removeItem({{ $item->id }})"
-                            class="text-gray-400 hover:text-black">
-                        ✕
+                            aria-label="Hapus item"
+                            class="text-gray-400 hover:text-black inline-flex items-center justify-center">
+                        <x-icon name="x-mark" class="w-4 h-4" />
                     </button>
 
                 </div>

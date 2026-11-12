@@ -71,7 +71,12 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">Semua pesanan sudah dibayar ✓</td>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                <span class="inline-flex items-center justify-center gap-1.5">
+                                    <span>Semua pesanan sudah dibayar</span>
+                                    <x-icon name="check" class="w-4 h-4 text-green-600" />
+                                </span>
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

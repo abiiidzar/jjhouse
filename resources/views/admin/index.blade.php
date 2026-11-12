@@ -137,7 +137,10 @@
 
     <!-- Featured Products Management -->
     <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">📌 Kelola Produk Featured di Home</h3>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <x-icon name="pin" class="w-5 h-5 text-blue-600" />
+            <span>Kelola Produk Featured di Home</span>
+        </h3>
         <livewire:admin.manage-featured-products />
     </div>
 

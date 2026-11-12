@@ -10,12 +10,14 @@
     {{-- Flash Messages --}}
     @if (session('success'))
     <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
-        <span class="text-green-500">✓</span> {{ session('success') }}
+        <x-icon name="check" class="w-4 h-4 text-green-500 shrink-0" />
+        <span>{{ session('success') }}</span>
     </div>
     @endif
     @if (session('error'))
     <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2">
-        <span class="text-red-500">✕</span> {{ session('error') }}
+        <x-icon name="x-mark" class="w-4 h-4 text-red-500 shrink-0" />
+        <span>{{ session('error') }}</span>
     </div>
     @endif
 
@@ -106,7 +108,7 @@
                                          class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300 text-lg">
-                                        <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" class="w-6 h-6">
+                                        <img src="{{ asset('images/asset.png') }}" alt="No Image" class="w-6 h-6">
                                     </div>
                                 @endif
                             </div>
@@ -168,7 +170,10 @@
                                     <span class="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-700 font-medium">Pre-order</span>
                                 @endif
                                 @if($product->is_featured_home)
-                                    <span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 font-medium">📌 Home</span>
+                                    <span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 font-medium inline-flex items-center gap-1">
+                                        <x-icon name="pin" class="w-3 h-3" />
+                                        <span>Home</span>
+                                    </span>
                                 @endif
                             </div>
                         </td>
@@ -237,7 +242,9 @@
                     @empty
                     <tr>
                         <td colspan="9" class="px-4 py-16 text-center">
-                            <div class="text-gray-300 text-5xl mb-3">📦</div>
+                            <div class="text-gray-300 mb-3 flex justify-center">
+                                <x-icon name="cube" class="w-12 h-12" />
+                            </div>
                             <p class="text-gray-400 text-sm">Belum ada produk. <a href="{{ route('admin.products.create') }}" class="text-blue-600 hover:underline">Tambah sekarang</a></p>
                         </td>
                     </tr>

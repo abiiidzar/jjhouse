@@ -94,14 +94,16 @@
     <!-- Notice (informational, e.g. local estimate) -->
     @if($notice)
         <div class="mt-4 bg-blue-50 border border-blue-200 text-blue-700 p-3 rounded-lg text-xs flex items-center gap-2">
-            <span></span> {{ $notice }}
+            <x-icon name="information-circle" class="w-4 h-4 shrink-0" />
+            <span>{{ $notice }}</span>
         </div>
     @endif
 
     <!-- Error -->
     @if($error)
         <div class="mt-4 bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs flex items-center gap-2">
-            <span>⚠️</span> {{ $error }}
+            <x-icon name="exclamation-triangle" class="w-4 h-4 shrink-0" />
+            <span>{{ $error }}</span>
         </div>
     @endif
 

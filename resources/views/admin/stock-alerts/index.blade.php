@@ -35,9 +35,9 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    <option value="active" {{ $status === 'active' ? 'selected' : '' }}>🔴 Active</option>
-                    <option value="acknowledged" {{ $status === 'acknowledged' ? 'selected' : '' }}>🟡 Acknowledged</option>
-                    <option value="resolved" {{ $status === 'resolved' ? 'selected' : '' }}>🟢 Resolved</option>
+                    <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="acknowledged" {{ $status === 'acknowledged' ? 'selected' : '' }}>Acknowledged</option>
+                    <option value="resolved" {{ $status === 'resolved' ? 'selected' : '' }}>Resolved</option>
                     <option value="all" {{ $status === 'all' ? 'selected' : '' }}>All</option>
                 </select>
             </div>
@@ -51,8 +51,9 @@
 
             <!-- Submit -->
             <div class="flex items-end gap-2">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
-                    🔍 Filter
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition inline-flex items-center justify-center gap-2">
+                    <x-icon name="search" class="w-4 h-4" />
+                    <span>Filter</span>
                 </button>
             </div>
         </form>
@@ -91,21 +92,24 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{ $alert->threshold }} units</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($alert->status === 'active')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                                🔴 Active
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <x-icon name="dot" class="w-3 h-3 text-red-500" />
+                                <span>Active</span>
                             </span>
                         @elseif($alert->status === 'acknowledged')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                🟡 Acknowledged
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                <x-icon name="dot" class="w-3 h-3 text-yellow-500" />
+                                <span>Acknowledged</span>
                             </span>
                         @elseif($alert->status === 'resolved')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                🟢 Resolved
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                <x-icon name="dot" class="w-3 h-3 text-green-500" />
+                                <span>Resolved</span>
                             </span>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {{ $alert->first_triggered_at?->format('M d, Y H:i') }}
+                        {{ ($alert->first_triggered_at ?? $alert->created_at)?->format('M d, Y H:i') ?? '-' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <a href="{{ route('admin.stock-alerts.show', $alert->id) }}"
@@ -136,7 +140,10 @@
     <!-- Info Box -->
     <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div class="text-sm">
-            <strong>📌 How it works:</strong>
+            <strong class="inline-flex items-center gap-1.5">
+                <x-icon name="pin" class="w-4 h-4 text-blue-600" />
+                <span>How it works:</span>
+            </strong>
             <ul class="list-disc list-inside mt-2 text-blue-900">
                 <li>Alerts are automatically created when product stock falls below the threshold (default: 5 units)</li>
                 <li>You'll receive email notifications for new alerts</li>

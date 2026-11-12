@@ -18,7 +18,10 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Customer Info -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-600 mb-2">👤 Pelanggan</h3>
+                <h3 class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
+                    <x-icon name="user" class="w-4 h-4 text-gray-500" />
+                    <span>Pelanggan</span>
+                </h3>
                 <p class="text-lg font-semibold text-gray-900">{{ $order->user->name }}</p>
                 <p class="text-sm text-gray-600">{{ $order->user->phone }}</p>
                 <p class="text-sm text-gray-600">{{ $order->user->email }}</p>
@@ -26,7 +29,10 @@
 
             <!-- Shipping Address -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-600 mb-2">📍 Alamat Pengiriman</h3>
+                <h3 class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
+                    <x-icon name="map-pin" class="w-4 h-4 text-gray-500" />
+                    <span>Alamat Pengiriman</span>
+                </h3>
                 <p class="text-sm text-gray-900">{{ $order->shipping_address }}</p>
                 <p class="text-sm text-gray-600 mt-2">
                     Kurir: <strong>{{ ucfirst(str_replace('_', ' ', $order->shipping_courier ?? 'N/A')) }}</strong>
@@ -48,7 +54,10 @@
 
             <!-- Order Status -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-600 mb-2">📦 Status Pesanan</h3>
+                <h3 class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
+                    <x-icon name="cube" class="w-4 h-4 text-gray-500" />
+                    <span>Status Pesanan</span>
+                </h3>
                 <div class="mb-3">
                     <span class="px-4 py-2 rounded-full text-sm font-semibold
                         {{ $order->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
@@ -67,7 +76,10 @@
 
     <!-- Picking List / Item Details -->
     <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold mb-4">📋 Daftar Item yang Harus Dikemas</h3>
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <x-icon name="clipboard-list" class="w-5 h-5 text-gray-700" />
+            <span>Daftar Item yang Harus Dikemas</span>
+        </h3>
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -78,7 +90,9 @@
                         <th class="px-4 py-3 text-center font-semibold text-gray-700">Qty</th>
                         <th class="px-4 py-3 text-right font-semibold text-gray-700">Harga</th>
                         <th class="px-4 py-3 text-right font-semibold text-gray-700">Subtotal</th>
-                        <th class="px-4 py-3 text-center font-semibold text-gray-700">✓</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-700">
+                            <x-icon name="check" class="w-4 h-4 mx-auto" />
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -130,7 +144,10 @@
 
     <!-- Update Status -->
     <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold mb-4">🔄 Update Status Pesanan</h3>
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <x-icon name="arrow-path" class="w-5 h-5 text-blue-600" />
+            <span>Update Status Pesanan</span>
+        </h3>
 
         <form action="{{ route('karyawan.orders.updateStatus', $order) }}" method="POST" class="space-y-4">
             @csrf
@@ -140,12 +157,12 @@
                 <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
                 <select name="status" id="status" required class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                     <option value="">-- Pilih Status --</option>
-                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>🟡 Pending (Baru)</option>
-                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>🟠 Processing (Dikemas)</option>
-                    <option value="ready_to_ship" {{ $order->status === 'ready_to_ship' ? 'selected' : '' }}>🟢 Ready to Ship (Siap Dikirim)</option>
-                    <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>🔵 Shipped (Dikirim)</option>
-                    <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>✅ Delivered (Diterima)</option>
-                    <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>❌ Cancelled (Dibatalkan)</option>
+                    <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending (Baru)</option>
+                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing (Dikemas)</option>
+                    <option value="ready_to_ship" {{ $order->status === 'ready_to_ship' ? 'selected' : '' }}>Ready to Ship (Siap Dikirim)</option>
+                    <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped (Dikirim)</option>
+                    <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered (Diterima)</option>
+                    <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled (Dibatalkan)</option>
                 </select>
                 @error('status')
                 <span class="text-red-600 text-sm">{{ $message }}</span>
@@ -171,8 +188,9 @@
             </div>
 
             <div class="flex gap-3">
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                    💾 Simpan Perubahan
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium inline-flex items-center gap-2">
+                    <x-icon name="save" class="w-4 h-4" />
+                    <span>Simpan Perubahan</span>
                 </button>
                 <a href="{{ route('karyawan.orders.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-medium">
                     ← Kembali
@@ -183,12 +201,15 @@
 
     <!-- Status Timeline -->
     <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold mb-4">📈 Timeline Status</h3>
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <x-icon name="trending-up" class="w-5 h-5 text-blue-600" />
+            <span>Timeline Status</span>
+        </h3>
         <div class="space-y-3">
             <div class="flex items-start gap-4">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center h-8 w-8 rounded-full {{ $order->status !== 'pending' ? 'bg-green-100' : 'bg-yellow-100' }}">
-                        <span class="text-sm font-bold {{ $order->status !== 'pending' ? 'text-green-600' : 'text-yellow-600' }}">✓</span>
+                    <div class="flex items-center justify-center h-8 w-8 rounded-full {{ $order->status !== 'pending' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600' }}">
+                        <x-icon name="check" class="w-4 h-4" />
                     </div>
                 </div>
                 <div>
@@ -199,8 +220,12 @@
 
             <div class="flex items-start gap-4">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center h-8 w-8 rounded-full {{ $order->status !== 'pending' ? 'bg-green-100' : 'bg-gray-100' }}">
-                        <span class="text-sm font-bold {{ $order->status !== 'pending' ? 'text-green-600' : 'text-gray-600' }}">{{ $order->status !== 'pending' ? '✓' : '○' }}</span>
+                    <div class="flex items-center justify-center h-8 w-8 rounded-full {{ $order->status !== 'pending' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' }}">
+                        @if($order->status !== 'pending')
+                            <x-icon name="check" class="w-4 h-4" />
+                        @else
+                            <x-icon name="dot" class="w-3 h-3" />
+                        @endif
                     </div>
                 </div>
                 <div>
@@ -211,8 +236,12 @@
 
             <div class="flex items-start gap-4">
                 <div class="flex-shrink-0">
-                    <div class="flex items-center justify-center h-8 w-8 rounded-full {{ in_array($order->status, ['ready_to_ship', 'shipped', 'delivered']) ? 'bg-green-100' : 'bg-gray-100' }}">
-                        <span class="text-sm font-bold {{ in_array($order->status, ['ready_to_ship', 'shipped', 'delivered']) ? 'text-green-600' : 'text-gray-600' }}">{{ in_array($order->status, ['ready_to_ship', 'shipped', 'delivered']) ? '✓' : '○' }}</span>
+                    <div class="flex items-center justify-center h-8 w-8 rounded-full {{ in_array($order->status, ['ready_to_ship', 'shipped', 'delivered']) ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' }}">
+                        @if(in_array($order->status, ['ready_to_ship', 'shipped', 'delivered']))
+                            <x-icon name="check" class="w-4 h-4" />
+                        @else
+                            <x-icon name="dot" class="w-3 h-3" />
+                        @endif
                     </div>
                 </div>
                 <div>
@@ -225,7 +254,10 @@
 
     <!-- Workflow Instruction -->
     <div class="bg-blue-50 border-l-4 border-blue-400 rounded p-4">
-        <p class="font-semibold text-blue-900">📌 Alur Kerja Pemesanan</p>
+        <p class="font-semibold text-blue-900 flex items-center gap-1.5">
+            <x-icon name="pin" class="w-4 h-4 text-blue-700" />
+            <span>Alur Kerja Pemesanan</span>
+        </p>
         <ol class="text-sm text-blue-800 mt-2 space-y-1 list-decimal list-inside">
             <li>Pesanan masuk dengan status <strong>Pending</strong></li>
             <li>Kemas produk dan ubah status menjadi <strong>Processing</strong></li>

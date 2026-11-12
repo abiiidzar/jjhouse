@@ -74,8 +74,9 @@
         </div> --}}
         <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
             <div class="p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                    🖼️ Hero Slider Images
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2.5">
+                    <x-icon name="image" class="w-7 h-7 text-gray-700" />
+                    <span>Hero Slider Images</span>
                 </h2>
                 <p class="text-gray-600 text-sm mt-1">
                     Upload 3 gambar untuk slider hero (01, 02, 03)
@@ -120,8 +121,9 @@
         <!-- Story Image Section -->
         <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
             <div class="p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                    <span class="text-3xl mr-3">📖</span> Story Image
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <x-icon name="book-open" class="w-7 h-7 text-gray-700" />
+                    <span>Story Image</span>
                 </h2>
                 <p class="text-gray-600 text-sm mt-1">Upload gambar yang tampil di samping kiri section story</p>
             </div>
@@ -144,7 +146,10 @@
 
                             <div class="border-2 border-dashed border-green-400 rounded-lg p-6 text-center cursor-pointer hover:bg-green-50 transition"
                                  onclick="document.getElementById('story_image').click()">
-                                <p class="text-gray-600">📁 Click to upload or drag and drop</p>
+                                <p class="text-gray-600 inline-flex items-center justify-center gap-2">
+                                    <x-icon name="folder" class="w-5 h-5 text-green-600" />
+                                    <span>Click to upload or drag and drop</span>
+                                </p>
                                 <p class="text-sm text-gray-500">PNG, JPG, GIF (Max 5MB)</p>
                                 <input type="file" id="story_image" name="story_image" class="hidden" accept="image/*" required>
                             </div>
@@ -153,16 +158,18 @@
                                 <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                             @enderror
 
-                            <button type="submit" class="w-full mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
-                                ✓ Upload Story Image
+                            <button type="submit" class="w-full mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium inline-flex items-center justify-center gap-2">
+                                <x-icon name="check" class="w-4 h-4" />
+                                <span>Upload Story Image</span>
                             </button>
                         </form>
 
                         <form action="{{ route('admin.media.reset') }}" method="POST" class="mt-3">
                             @csrf
                             <input type="hidden" name="image_type" value="story">
-                            <button type="submit" class="w-full px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 font-medium text-sm">
-                                ↺ Reset to Default
+                            <button type="submit" class="w-full px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 font-medium text-sm inline-flex items-center justify-center gap-1.5">
+                                <x-icon name="arrow-path" class="w-4 h-4" />
+                                <span>Reset to Default</span>
                             </button>
                         </form>
                     </div>
@@ -173,8 +180,9 @@
         <!-- Home Page Settings Section -->
         <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
             <div class="p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                    <span class="text-3xl mr-3">⚙️</span> Home Page Settings
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <x-icon name="cog" class="w-7 h-7 text-gray-700" />
+                    <span>Home Page Settings</span>
                 </h2>
                 <p class="text-gray-600 text-sm mt-1">Control visibility dan tampilan section di halaman home</p>
             </div>
@@ -186,8 +194,9 @@
                     <div class="space-y-6">
                         <!-- Featured Products Count -->
                         <div>
-                            <label for="featured_products_count" class="block text-sm font-medium text-gray-700 mb-2">
-                                🛍️ Jumlah Featured Products yang Ditampilkan
+                            <label for="featured_products_count" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                <x-icon name="shopping-bag" class="w-4 h-4 text-gray-600" />
+                                <span>Jumlah Featured Products yang Ditampilkan</span>
                             </label>
                             <input type="number" id="featured_products_count" name="featured_products_count"
                                    min="1" max="20" value="{{ $homeSettings['featured_products_count'] }}"
@@ -197,13 +206,19 @@
 
                         <!-- Section Visibility Settings -->
                         <div class="border-t pt-6">
-                            <p class="text-sm font-semibold text-gray-700 mb-4">📋 Visibility Sections</p>
+                            <p class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                <x-icon name="clipboard-list" class="w-4 h-4 text-gray-600" />
+                                <span>Visibility Sections</span>
+                            </p>
 
                             <div class="space-y-4">
                                 <!-- Story Section Toggle -->
                                 <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
                                     <div>
-                                        <p class="font-medium text-gray-700">📖 Story Section</p>
+                                        <p class="font-medium text-gray-700 flex items-center gap-2">
+                                            <x-icon name="book-open" class="w-4 h-4 text-gray-600" />
+                                            <span>Story Section</span>
+                                        </p>
                                         <p class="text-sm text-gray-500">Gambar story dengan teks di samping</p>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
@@ -218,7 +233,10 @@
                                 <!-- Featured Products Toggle -->
                                 <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
                                     <div>
-                                        <p class="font-medium text-gray-700">🎠 Featured Products</p>
+                                        <p class="font-medium text-gray-700 flex items-center gap-2">
+                                            <x-icon name="sparkles" class="w-4 h-4 text-gray-600" />
+                                            <span>Featured Products</span>
+                                        </p>
                                         <p class="text-sm text-gray-500">Carousel produk featured</p>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
@@ -233,7 +251,10 @@
                                 <!-- Editorial Grid Toggle -->
                                 <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
                                     <div>
-                                        <p class="font-medium text-gray-700">🎨 Editorial Grid</p>
+                                        <p class="font-medium text-gray-700 flex items-center gap-2">
+                                            <x-icon name="swatch" class="w-4 h-4 text-gray-600" />
+                                            <span>Editorial Grid</span>
+                                        </p>
                                         <p class="text-sm text-gray-500">Grid 3 gambar editorial di bawah</p>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
@@ -249,8 +270,9 @@
                     </div>
 
                     <div class="mt-6 flex justify-end">
-                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                            ✓ Save Settings
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium inline-flex items-center gap-2">
+                            <x-icon name="check" class="w-4 h-4" />
+                            <span>Save Settings</span>
                         </button>
                     </div>
                 </form>
@@ -276,7 +298,10 @@
 
                             <div class="border-2 border-dashed border-purple-400 rounded-lg p-4 text-center cursor-pointer hover:bg-purple-50 transition mb-3"
                                  onclick="document.getElementById('editorial_{{ $position }}').click()">
-                                <p class="text-sm text-gray-600">📁 Click to upload</p>
+                                <p class="text-sm text-gray-600 inline-flex items-center justify-center gap-1.5">
+                                    <x-icon name="folder" class="w-4 h-4 text-purple-600" />
+                                    <span>Click to upload</span>
+                                </p>
                                 <input type="file" id="editorial_{{ $position }}" name="editorial_image" class="hidden" accept="image/*" required>
                             </div>
 
@@ -300,9 +325,12 @@
 
         <!-- Info Box -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
-            <p class="text-blue-800">
-                <strong>💡 Tips:</strong> Gunakan ukuran gambar yang optimal untuk performa lebih baik.
-                Rekomendasi: Hero image 1920x1080px, Story image 600x600px, Editorial images 600x600px.
+            <p class="text-blue-800 flex items-start gap-2">
+                <x-icon name="light-bulb" class="w-5 h-5 text-blue-600 mt-0.5" />
+                <span>
+                    <strong>Tips:</strong> Gunakan ukuran gambar yang optimal untuk performa lebih baik.
+                    Rekomendasi: Hero image 1920x1080px, Story image 600x600px, Editorial images 600x600px.
+                </span>
             </p>
         </div>
     </div>

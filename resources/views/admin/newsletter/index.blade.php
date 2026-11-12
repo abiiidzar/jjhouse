@@ -19,6 +19,13 @@
         </div>
     </div>
 
+    @if (session('success'))
+        <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+            <x-icon name="check-circle" class="w-4 h-4 shrink-0" />
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
     <!-- SEARCH -->
     <form method="GET" class="mb-4 flex gap-2">
         <input name="search"
@@ -28,8 +35,8 @@
 
         <select name="status" class="border px-3 py-2 rounded">
             <option value="">All</option>
-            <option value="active">Active</option>
-            <option value="inactive">Unsubscribed</option>
+            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Unsubscribed</option>
         </select>
 
         <button class="bg-black text-white px-4 py-2 rounded">Filter</button>
@@ -64,12 +71,30 @@
                     </td>
 
                     <td class="text-center">
-                        <form method="POST" action="{{ route('admin.newsletter.subscribers.destroy', $sub->id) }}">
-                            @csrf @method('DELETE')
-                            <button class="text-red-500 hover:underline text-xs">
-                                Delete
-                            </button>
-                        </form>
+                        <div class="flex items-center justify-center gap-1.5">
+                            <form method="POST" action="{{ route('admin.newsletter.subscribers.toggle-status', $sub->id) }}" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                        title="{{ $sub->is_active ? 'Jadikan Unsubscribed' : 'Jadikan Active' }}"
+                                        aria-label="{{ $sub->is_active ? 'Jadikan Unsubscribed' : 'Jadikan Active' }}"
+                                        class="p-1.5 rounded-lg {{ $sub->is_active ? 'text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50' : 'text-green-600 hover:text-green-900 hover:bg-green-50' }} transition inline-flex items-center justify-center">
+                                    <x-icon name="power" class="w-4 h-4" />
+                                    <span class="sr-only">{{ $sub->is_active ? 'Jadikan Unsubscribed' : 'Jadikan Active' }}</span>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ route('admin.newsletter.subscribers.destroy', $sub->id) }}" class="inline">
+                                @csrf @method('DELETE')
+                                <button type="submit"
+                                        onclick="return confirm('Yakin ingin menghapus subscriber ini?')"
+                                        title="Delete"
+                                        aria-label="Delete"
+                                        class="p-1.5 rounded-lg text-red-500 hover:text-red-800 hover:bg-red-50 transition inline-flex items-center justify-center">
+                                    <x-icon name="trash" class="w-4 h-4" />
+                                    <span class="sr-only">Delete</span>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

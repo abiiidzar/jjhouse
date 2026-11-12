@@ -11,7 +11,10 @@
     <!-- 🔥 LEFT: LIST PESANAN -->
     <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
 
-        <h2 class="text-lg font-semibold mb-4">💳 Pesanan Belum Dibayar</h2>
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <x-icon name="credit-card" class="w-5 h-5 text-gray-700" />
+            <span>Pesanan Belum Dibayar</span>
+        </h2>
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -73,7 +76,10 @@
     <!-- 🔥 RIGHT: PANEL CEPAT -->
     <div class="bg-white rounded-lg shadow p-6">
 
-        <h2 class="text-lg font-semibold mb-4">⚡ Aksi Cepat</h2>
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <x-icon name="bolt" class="w-5 h-5 text-yellow-500" />
+            <span>Aksi Cepat</span>
+        </h2>
 
         <div class="space-y-3">
 
@@ -98,8 +104,9 @@
         </div>
 
         <!-- INFO -->
-        <div class="mt-6 bg-gray-50 p-4 rounded-lg text-sm text-gray-600">
-            💡 Klik <b>Proses</b> untuk menyelesaikan pembayaran.
+        <div class="mt-6 bg-gray-50 p-4 rounded-lg text-sm text-gray-600 flex items-start gap-2">
+            <x-icon name="light-bulb" class="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+            <span>Klik <b>Proses</b> untuk menyelesaikan pembayaran.</span>
         </div>
 
     </div>

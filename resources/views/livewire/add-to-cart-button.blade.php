@@ -2,8 +2,9 @@
 
     <!-- SUCCESS MESSAGE -->
     @if($showSuccess)
-        <div class="text-sm text-green-600 tracking-wide">
-            ✓ Product added to cart
+        <div class="text-sm text-green-600 tracking-wide flex items-center gap-1.5">
+            <x-icon name="check" class="w-4 h-4 shrink-0" />
+            <span>Product added to cart</span>
         </div>
     @endif
 

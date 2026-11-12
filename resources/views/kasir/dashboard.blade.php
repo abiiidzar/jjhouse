@@ -17,7 +17,9 @@
                         <p class="text-3xl font-bold text-red-600">
                             {{ $unpaid }}</p>
                     </div>
-                    <div class="text-4xl text-red-200">💳</div>
+                    <div class="p-2.5 rounded-lg bg-red-50 text-red-500">
+                        <x-icon name="credit-card" class="w-8 h-8" />
+                    </div>
                 </div>
 
             </div>
@@ -29,7 +31,9 @@
                         <p class="text-gray-600 text-sm">Pesanan Hari Ini</p>
                         <p class="text-3xl font-bold text-blue-600">{{ \App\Models\Order::whereDate('created_at', today())->count() }}</p>
                     </div>
-                    <div class="text-4xl text-blue-200">📅</div>
+                    <div class="p-2.5 rounded-lg bg-blue-50 text-blue-500">
+                        <x-icon name="calendar" class="w-8 h-8" />
+                    </div>
                 </div>
             </div>
 
@@ -40,7 +44,9 @@
                         <p class="text-gray-600 text-sm">Pendapatan Hari Ini</p>
                         <p class="text-3xl font-bold text-green-600">Rp {{ number_format(\App\Models\Order::whereDate('created_at', today())->where('payment_status', 'paid')->sum('total_amount'), 0, ',', '.') }}</p>
                     </div>
-                    <div class="text-4xl text-green-200">💰</div>
+                    <div class="p-2.5 rounded-lg bg-green-50 text-green-500">
+                        <x-icon name="banknotes" class="w-8 h-8" />
+                    </div>
                 </div>
             </div>
 
@@ -55,7 +61,9 @@
                         @endphp
                         <p class="text-3xl font-bold text-purple-600">Rp {{ number_format($avgTransaction, 0, ',', '.') }}</p>
                     </div>
-                    <div class="text-4xl text-purple-200">📊</div>
+                    <div class="p-2.5 rounded-lg bg-purple-50 text-purple-500">
+                        <x-icon name="chart-bar" class="w-8 h-8" />
+                    </div>
                 </div>
             </div>
 
@@ -79,7 +87,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Menu Cepat -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">💼 Menu Cepat</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <x-icon name="briefcase" class="w-5 h-5 text-gray-700" />
+                    <span>Menu Cepat</span>
+                </h2>
                 <div class="space-y-3">
                     <a href="{{ route('kasir.orders.index') }}" class="block p-3 bg-red-50 rounded-lg hover:bg-red-100 transition">
                         <p class="font-semibold text-red-600">Proses Pembayaran</p>
@@ -102,7 +113,10 @@
 
             <!-- Informasi Penting -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">ℹ️ Informasi Penting</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <x-icon name="information-circle" class="w-5 h-5 text-blue-600" />
+                    <span>Informasi Penting</span>
+                </h2>
                 <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
                     <p class="text-sm text-red-800">
                         <strong>Perhatian:</strong> Selalu konfirmasi jumlah pembayaran sebelum menerima uang dari pelanggan.
@@ -118,7 +132,10 @@
 
         <!-- Pesanan Belum Dibayar -->
         <div class="bg-white rounded-lg shadow p-6 mt-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">💳 Pesanan Menunggu Pembayaran</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <x-icon name="credit-card" class="w-5 h-5 text-gray-700" />
+                <span>Pesanan Menunggu Pembayaran</span>
+            </h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50">
@@ -143,7 +160,12 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-3 text-center text-gray-500">Semua pesanan sudah dibayar ✓</td>
+                            <td colspan="5" class="px-6 py-3 text-center text-gray-500">
+                                <span class="inline-flex items-center justify-center gap-1.5">
+                                    <span>Semua pesanan sudah dibayar</span>
+                                    <x-icon name="check" class="w-4 h-4 text-green-600" />
+                                </span>
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

@@ -59,7 +59,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">First Triggered</label>
-                        <p class="text-gray-900">{{ $stockAlert->first_triggered_at?->format('M d, Y H:i') }}</p>
+                        <p class="text-gray-900">{{ ($stockAlert->first_triggered_at ?? $stockAlert->created_at)?->format('M d, Y H:i') ?? '-' }}</p>
                     </div>
                 </div>
             </div>
@@ -125,7 +125,10 @@
 
             <!-- Stock History -->
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Stock History</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <x-icon name="chart-bar" class="w-5 h-5 text-gray-700" />
+                    <span>Stock History</span>
+                </h3>
 
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
@@ -186,14 +189,20 @@
                     </div>
                     <div>
                         <span class="text-gray-600">Priority:</span>
-                        <span class="font-medium text-gray-900 ml-2">
-                            {{ $stockAlert->current_stock == 0 ? '🔴 Critical' : '🟡 High' }}
+                        <span class="font-medium text-gray-900 ml-2 inline-flex items-center gap-1.5">
+                            @if($stockAlert->current_stock == 0)
+                                <x-icon name="dot" class="w-3 h-3 text-red-500" />
+                                <span>Critical</span>
+                            @else
+                                <x-icon name="dot" class="w-3 h-3 text-yellow-500" />
+                                <span>High</span>
+                            @endif
                         </span>
                     </div>
                     <div>
                         <span class="text-gray-600">Days Since Alert:</span>
                         <span class="font-medium text-gray-900 ml-2">
-                            {{ $stockAlert->first_triggered_at?->diffInDays(now()) ?? 0 }} days
+                            {{ ($stockAlert->first_triggered_at ?? $stockAlert->created_at)?->diffInDays(now()) ?? 0 }} days
                         </span>
                     </div>
                 </div>

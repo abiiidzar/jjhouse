@@ -5,10 +5,15 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="bg-black text-white py-20">
+<section data-theme="dark" class="bg-black text-white pt-32 pb-20">
     <div class="container mx-auto px-4 text-center">
         <h1 class="text-4xl md:text-6xl font-bold tracking-tighter mb-4">THE JOURNAL</h1>
         <p class="text-gray-400 text-lg max-w-2xl mx-auto">Stories, style guides, and cultural commentary from the JJHOUSE universe.</p>
+        <div class="mt-6">
+            <a href="{{ route('blog.feed') }}" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-gray-400 hover:text-white transition">
+                RSS Feed
+            </a>
+        </div>
     </div>
 </section>
 

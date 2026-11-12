@@ -12,9 +12,23 @@ class NewsletterController extends Controller
     /**
      * Display a listing of newsletter subscribers.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subscribers = NewsletterSubscription::latest()->paginate(20);
+        $query = NewsletterSubscription::query();
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
+            $query->where('email', 'like', "%{$search}%");
+        }
+
+        if ($request->input('status') === 'active') {
+            $query->where('is_active', true);
+        } elseif ($request->input('status') === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        $subscribers = $query->latest()->paginate(20)->withQueryString();
+
         return view('admin.newsletter.index', compact('subscribers'));
     }
 
@@ -108,6 +122,20 @@ class NewsletterController extends Controller
     }
 
     /**
+     * Toggle active/unsubscribed status for a subscriber
+     */
+    public function toggleStatus(NewsletterSubscription $subscriber)
+    {
+        $subscriber->update([
+            'is_active' => !$subscriber->is_active,
+        ]);
+
+        $statusLabel = $subscriber->is_active ? 'Active' : 'Unsubscribed';
+
+        return back()->with('success', "Status subscriber {$subscriber->email} berhasil diubah menjadi {$statusLabel}");
+    }
+
+    /**
      * Destroy a subscriber
      */
     public function destroy(NewsletterSubscription $subscriber)
@@ -161,7 +189,7 @@ class NewsletterController extends Controller
             }
         }
 
-        return redirect()->route('admin.newsletter.subscribers.campaign')
+        return redirect()->route('admin.newsletter.campaign')
             ->with('success', 'Campaign sent to ' . $subscribers->count() . ' subscribers');
     }
 

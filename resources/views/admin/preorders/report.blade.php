@@ -17,8 +17,8 @@
                         <p class="text-sm text-gray-500">Total Pre-orders</p>
                         <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ $totalPreorder }}</h3>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        📦
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                        <x-icon name="cube" class="w-6 h-6" />
                     </div>
                 </div>
             </div>
@@ -32,8 +32,8 @@
                             Rp {{ number_format($totalDP, 0, ',', '.') }}
                         </h3>
                     </div>
-                    <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
-                        💰
+                    <div class="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center">
+                        <x-icon name="banknotes" class="w-6 h-6" />
                     </div>
                 </div>
             </div>
@@ -47,8 +47,8 @@
                             Rp {{ number_format($totalRemaining, 0, ',', '.') }}
                         </h3>
                     </div>
-                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                        ⏳
+                    <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+                        <x-icon name="clock" class="w-6 h-6" />
                     </div>
                 </div>
             </div>
@@ -60,8 +60,8 @@
                         <p class="text-sm text-gray-500">Ready to Ship</p>
                         <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ $readyToShip }}</h3>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        🚚
+                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                        <x-icon name="truck" class="w-6 h-6" />
                     </div>
                 </div>
             </div>
@@ -83,8 +83,8 @@
                         <p class="text-sm text-gray-500">Pre-orders bulan ini</p>
                     </div>
 
-                    <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-xl">
-                        📊
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
+                        <x-icon name="chart-bar" class="w-7 h-7" />
                     </div>
                 </div>
             </div>

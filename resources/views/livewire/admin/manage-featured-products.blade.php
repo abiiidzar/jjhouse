@@ -19,14 +19,19 @@
         }"
         style="display:none"
     >
-        <span x-text="type === 'success' ? '✓' : (type === 'warning' ? '⚠' : (type === 'info' ? 'ℹ' : '✕'))"></span>
+        <x-icon x-show="type === 'success'" name="check" class="w-4 h-4 shrink-0" />
+        <x-icon x-show="type === 'warning'" name="exclamation-triangle" class="w-4 h-4 shrink-0" />
+        <x-icon x-show="type === 'info'" name="information-circle" class="w-4 h-4 shrink-0" />
+        <x-icon x-show="type === 'error'" name="x-mark" class="w-4 h-4 shrink-0" />
         <span x-text="message"></span>
     </div>
 
     {{-- ─── Search + Counter Bar ─── --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5">
         <div class="relative flex-1 w-full">
-            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">🔍</span>
+            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <x-icon name="search" class="w-4 h-4" />
+            </span>
             <input
                 type="text"
                 wire:model.live.debounce.300ms="searchTerm"
@@ -45,7 +50,10 @@
     {{-- ─── Selected Products Preview ─── --}}
     @if (!empty($selectedProducts))
     <div class="mb-6">
-        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">✅ Produk yang akan ditampilkan di Home</p>
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <x-icon name="check-circle" class="w-4 h-4 text-green-600" />
+            <span>Produk yang akan ditampilkan di Home</span>
+        </p>
         <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-2">
             @foreach ($allProducts as $product)
                 @if (in_array($product->id, $selectedProducts))
@@ -60,7 +68,7 @@
                                  class="w-full h-20 object-cover">
                         @else
                             <div class="w-full h-20 bg-gray-200 flex items-center justify-center">
-                                <span class="text-2xl"><img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6"></span>
+                                <span class="text-2xl"><img src="{{ asset('images/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6"></span>
                             </div>
                         @endif
                         {{-- Check badge --}}
@@ -93,7 +101,10 @@
 
     {{-- ─── Available Products Grid ─── --}}
     <div class="mb-6">
-        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">📦 Semua Produk Aktif</p>
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <x-icon name="cube" class="w-4 h-4 text-gray-500" />
+            <span>Semua Produk Aktif</span>
+        </p>
         <div class="border border-gray-200 rounded-xl p-3 max-h-[420px] overflow-y-auto bg-gray-50">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 @forelse ($allProducts as $product)
@@ -111,7 +122,7 @@
                                      class="w-full h-24 object-cover">
                             @else
                                 <div class="w-full h-24 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
+                                    <img src="{{ asset('images/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                                 </div>
                             @endif
 
@@ -147,7 +158,9 @@
                     </div>
                 @empty
                     <div class="col-span-full text-center py-12 text-gray-400">
-                        <p class="text-4xl mb-2">🔍</p>
+                        <div class="mb-2 flex justify-center">
+                            <x-icon name="search" class="w-9 h-9 text-gray-300" />
+                        </div>
                         <p class="text-sm">Tidak ada produk ditemukan</p>
                     </div>
                 @endforelse
@@ -160,12 +173,14 @@
         <p class="text-xs text-gray-400">Klik produk untuk pilih/hapus dari featured. Hover untuk edit.</p>
         <div class="flex gap-2">
             <button wire:click="clearAll" type="button"
-                class="px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition">
-                🗑 Bersihkan Semua
+                class="px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition inline-flex items-center gap-1.5">
+                <x-icon name="trash" class="w-4 h-4" />
+                <span>Bersihkan Semua</span>
             </button>
             <button wire:click="saveFeatured" type="button"
-                class="px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition">
-                💾 Simpan Perubahan
+                class="px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition inline-flex items-center gap-1.5">
+                <x-icon name="save" class="w-4 h-4" />
+                <span>Simpan Perubahan</span>
             </button>
         </div>
     </div>
@@ -188,7 +203,10 @@
             {{-- Header --}}
             <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10 rounded-t-2xl">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-800">✏️ Edit Produk</h3>
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <x-icon name="pencil-square" class="w-5 h-5 text-blue-600" />
+                        <span>Edit Produk</span>
+                    </h3>
                     <p class="text-xs text-gray-500 mt-0.5">{{ $editProduct->name }}</p>
                 </div>
                 <button wire:click="closeEditModal"
@@ -203,7 +221,10 @@
 
                 {{-- ─ Basic Info ─ --}}
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-100">📝 Informasi Dasar</h4>
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-100 flex items-center gap-1.5">
+                        <x-icon name="pencil-square" class="w-4 h-4 text-gray-500" />
+                        <span>Informasi Dasar</span>
+                    </h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                         <div class="md:col-span-2">
@@ -286,7 +307,10 @@
 
                 {{-- ─ Images ─ --}}
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-100">🖼️ Gambar Produk</h4>
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-100 flex items-center gap-1.5">
+                        <x-icon name="image" class="w-4 h-4 text-gray-500" />
+                        <span>Gambar Produk</span>
+                    </h4>
 
                     {{-- Existing images --}}
                     @if ($editProduct->images->isNotEmpty())
@@ -310,15 +334,19 @@
                                     </button>
                                 @else
                                     <button wire:click="markDeleteImage({{ $img->id }})"
-                                        class="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/40 text-white text-xs opacity-0 group-hover:opacity-100 transition-all font-bold">
-                                        🗑 Hapus
+                                        class="absolute inset-0 flex items-center justify-center gap-1 bg-black/0 hover:bg-black/40 text-white text-xs opacity-0 group-hover:opacity-100 transition-all font-bold">
+                                        <x-icon name="trash" class="w-3.5 h-3.5" />
+                                        <span>Hapus</span>
                                     </button>
                                 @endif
                             </div>
                             @endforeach
                         </div>
                         @if (!empty($deleteImageIds))
-                            <p class="text-xs text-red-500 mt-2">⚠ {{ count($deleteImageIds) }} gambar akan dihapus saat disimpan.</p>
+                            <p class="text-xs text-red-500 mt-2 flex items-center gap-1">
+                                <x-icon name="exclamation-triangle" class="w-3.5 h-3.5 shrink-0" />
+                                <span>{{ count($deleteImageIds) }} gambar akan dihapus saat disimpan.</span>
+                            </p>
                         @endif
                     </div>
                     @endif
@@ -330,9 +358,15 @@
                              onclick="document.getElementById('newPrimaryImageInput').click()">
                             @if ($newPrimaryImage)
                                 <img src="{{ $newPrimaryImage->temporaryUrl() }}" class="mx-auto h-28 object-contain rounded mb-2">
-                                <p class="text-xs text-green-600 font-medium">✓ {{ $newPrimaryImage->getClientOriginalName() }}</p>
+                                <p class="text-xs text-green-600 font-medium inline-flex items-center justify-center gap-1">
+                                    <x-icon name="check" class="w-3.5 h-3.5" />
+                                    <span>{{ $newPrimaryImage->getClientOriginalName() }}</span>
+                                </p>
                             @else
-                                <p class="text-gray-400 text-sm">📷 Klik untuk upload foto utama</p>
+                                <p class="text-gray-400 text-sm inline-flex items-center justify-center gap-1.5">
+                                    <x-icon name="camera" class="w-4 h-4" />
+                                    <span>Klik untuk upload foto utama</span>
+                                </p>
                                 <p class="text-gray-300 text-xs mt-1">PNG, JPG, WebP — Max 5MB</p>
                             @endif
                         </div>
@@ -352,9 +386,15 @@
                                         <img src="{{ $img->temporaryUrl() }}" class="h-16 w-16 object-cover rounded">
                                     @endforeach
                                 </div>
-                                <p class="text-xs text-green-600 font-medium mt-2">✓ {{ count($newAdditionalImages) }} foto dipilih</p>
+                                <p class="text-xs text-green-600 font-medium mt-2 inline-flex items-center justify-center gap-1">
+                                    <x-icon name="check" class="w-3.5 h-3.5" />
+                                    <span>{{ count($newAdditionalImages) }} foto dipilih</span>
+                                </p>
                             @else
-                                <p class="text-gray-400 text-sm">🗂 Klik untuk upload foto tambahan</p>
+                                <p class="text-gray-400 text-sm inline-flex items-center justify-center gap-1.5">
+                                    <x-icon name="folder-plus" class="w-4 h-4" />
+                                    <span>Klik untuk upload foto tambahan</span>
+                                </p>
                                 <p class="text-gray-300 text-xs mt-1">Bisa pilih beberapa sekaligus</p>
                             @endif
                         </div>
@@ -369,8 +409,9 @@
             <div class="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 flex items-center justify-between gap-3 rounded-b-2xl">
                 <a href="{{ route('admin.products.edit', $editProduct->id) }}"
                    target="_blank"
-                   class="text-xs text-blue-600 hover:underline flex items-center gap-1">
-                    🔗 Buka halaman edit lengkap
+                   class="text-xs text-blue-600 hover:underline flex items-center gap-1.5">
+                    <x-icon name="link" class="w-3.5 h-3.5" />
+                    <span>Buka halaman edit lengkap</span>
                 </a>
                 <div class="flex gap-3">
                     <button wire:click="closeEditModal" type="button"
@@ -381,7 +422,10 @@
                         wire:loading.attr="disabled"
                         wire:loading.class="opacity-70 cursor-not-allowed"
                         class="px-6 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition font-medium flex items-center gap-2">
-                        <span wire:loading.remove wire:target="saveProduct">💾 Simpan</span>
+                        <span wire:loading.remove wire:target="saveProduct" class="inline-flex items-center gap-1.5">
+                            <x-icon name="save" class="w-4 h-4" />
+                            <span>Simpan</span>
+                        </span>
                         <span wire:loading wire:target="saveProduct" class="flex items-center gap-2">
                             <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>

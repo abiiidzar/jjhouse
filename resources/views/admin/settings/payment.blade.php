@@ -26,8 +26,9 @@
 
     <!-- ALERT SUCCESS -->
     @if (session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-            ✓ {{ session('success') }}
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+            <x-icon name="check" class="w-4 h-4 shrink-0" />
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 

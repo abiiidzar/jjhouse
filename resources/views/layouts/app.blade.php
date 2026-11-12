@@ -24,6 +24,7 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('jj.png') }}">
+    <link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} Journal RSS Feed" href="{{ route('blog.feed') }}">
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>

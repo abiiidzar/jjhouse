@@ -33,16 +33,29 @@
                     </td>
                     <td class="px-6 py-4 text-sm">{{ $comment->created_at->format('d M Y') }}</td>
                     <td class="px-6 py-4">
-                        <div class="flex gap-2">
+                        <div class="flex items-center gap-1.5">
                             @if(!$comment->is_approved)
                             <form action="{{ route('admin.blog.comments.approve', $comment) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="text-green-600 hover:text-green-800 text-sm">Approve</button>
+                                @method('PATCH')
+                                <button type="submit"
+                                        title="Approve"
+                                        aria-label="Approve"
+                                        class="p-1.5 rounded-lg text-green-600 hover:text-green-900 hover:bg-green-50 transition inline-flex items-center justify-center">
+                                    <x-icon name="check-circle" class="w-4 h-4" />
+                                    <span class="sr-only">Approve</span>
+                                </button>
                             </form>
                             @endif
                             <form action="{{ route('admin.blog.comments.delete', $comment) }}" method="POST" onsubmit="return confirm('Delete this comment?')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                                <button type="submit"
+                                        title="Delete"
+                                        aria-label="Delete"
+                                        class="p-1.5 rounded-lg text-red-600 hover:text-red-900 hover:bg-red-50 transition inline-flex items-center justify-center">
+                                    <x-icon name="trash" class="w-4 h-4" />
+                                    <span class="sr-only">Delete</span>
+                                </button>
                             </form>
                         </div>
                     </td>

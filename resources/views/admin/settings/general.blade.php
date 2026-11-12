@@ -11,7 +11,10 @@
     <div class="bg-white rounded-lg shadow-sm p-6 max-w-3xl">
 
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800">⚙️ General Settings</h3>
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <x-icon name="cog" class="w-5 h-5 text-gray-600" />
+                <span>General Settings</span>
+            </h3>
             <p class="text-sm text-gray-500">Atur informasi dasar toko Anda</p>
         </div>
 
@@ -98,9 +101,10 @@
             <div class="pt-2">
                 <button
                     type="submit"
-                    class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                    class="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
                 >
-                    💾 Simpan Perubahan
+                    <x-icon name="save" class="w-5 h-5" />
+                    <span>Simpan Perubahan</span>
                 </button>
             </div>
 

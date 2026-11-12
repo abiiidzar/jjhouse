@@ -74,26 +74,45 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm">{{ $discount->priority }}</td>
-                        <td class="px-6 py-4 text-sm space-x-2">
-                            <a href="{{ route('admin.discounts.show', $discount) }}" class="text-gray-600 hover:text-gray-900 font-medium">
-                                Detail
-                            </a>
-                            <a href="{{ route('admin.discounts.edit', $discount) }}" class="text-blue-600 hover:text-blue-900 font-medium">
-                                Edit
-                            </a>
-                            <form action="{{ route('admin.discounts.toggle-status', $discount) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="text-yellow-600 hover:text-yellow-900 font-medium">
-                                    {{ $discount->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.discounts.destroy', $discount) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Yakin ingin menghapus?')" class="text-red-600 hover:text-red-900 font-medium">
-                                    Hapus
-                                </button>
-                            </form>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="flex items-center gap-1.5">
+                                <a href="{{ route('admin.discounts.show', $discount) }}"
+                                   title="Detail"
+                                   aria-label="Detail"
+                                   class="p-1.5 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition inline-flex items-center justify-center">
+                                    <x-icon name="eye" class="w-4 h-4" />
+                                    <span class="sr-only">Detail</span>
+                                </a>
+                                <a href="{{ route('admin.discounts.edit', $discount) }}"
+                                   title="Edit"
+                                   aria-label="Edit"
+                                   class="p-1.5 rounded-lg text-blue-600 hover:text-blue-900 hover:bg-blue-50 transition inline-flex items-center justify-center">
+                                    <x-icon name="pencil-square" class="w-4 h-4" />
+                                    <span class="sr-only">Edit</span>
+                                </a>
+                                <form action="{{ route('admin.discounts.toggle-status', $discount) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit"
+                                            title="{{ $discount->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
+                                            aria-label="{{ $discount->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
+                                            class="p-1.5 rounded-lg {{ $discount->is_active ? 'text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50' : 'text-green-600 hover:text-green-900 hover:bg-green-50' }} transition inline-flex items-center justify-center">
+                                        <x-icon name="power" class="w-4 h-4" />
+                                        <span class="sr-only">{{ $discount->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</span>
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.discounts.destroy', $discount) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            onclick="return confirm('Yakin ingin menghapus?')"
+                                            title="Hapus"
+                                            aria-label="Hapus"
+                                            class="p-1.5 rounded-lg text-red-600 hover:text-red-900 hover:bg-red-50 transition inline-flex items-center justify-center">
+                                        <x-icon name="trash" class="w-4 h-4" />
+                                        <span class="sr-only">Hapus</span>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty

@@ -1,13 +1,20 @@
 @extends('layouts.app')
 
 @section('title', $post->title . ' - JJHOUSE')
-@section('description', $post->meta_description ?? $post->excerpt)
+@section('description', $post->meta_description ?? $post->excerpt ?? '')
 @section('og_title', $post->title)
-@section('og_description', $post->meta_description ?? $post->excerpt)
+@section('og_description', $post->meta_description ?? $post->excerpt ?? '')
+@if($post->featured_image)
 @section('og_image', $post->featured_image)
+@endif
 
 @section('content')
-<div class="container mx-auto px-4 py-12 max-w-4xl">
+<div data-theme="light" class="container mx-auto px-4 pt-28 pb-12 max-w-4xl">
+    <div class="mb-6">
+        <a href="{{ route('blog.index') }}" class="inline-flex items-center text-xs uppercase tracking-widest text-gray-500 hover:text-black transition">
+            &larr; Back to Journal
+        </a>
+    </div>
     <!-- Header -->
     <div class="text-center mb-8">
         <div class="flex items-center justify-center gap-3 text-sm text-gray-500 mb-4">
@@ -28,7 +35,7 @@
 
     <!-- Featured Image -->
     @if($post->featured_image)
-    <div class="mb-8 rounded-xl overflow-hidden">
+    <div class="mb-8 max-w-3xl mx-auto rounded-xl overflow-hidden">
         <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" fetchpriority="high" decoding="async" class="w-full">
     </div>
     @endif

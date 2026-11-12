@@ -9,7 +9,10 @@
 {{-- Validation Errors --}}
 @if ($errors->any())
 <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-    <p class="font-semibold mb-1">⚠ Terdapat kesalahan:</p>
+    <p class="font-semibold mb-1 flex items-center gap-1.5">
+        <x-icon name="exclamation-triangle" class="w-4 h-4 shrink-0" />
+        <span>Terdapat kesalahan:</span>
+    </p>
     <ul class="list-disc list-inside text-sm space-y-1">
         @foreach ($errors->all() as $error)
             <li>{{ $error }}</li>
@@ -28,7 +31,10 @@
 
             {{-- Basic Info --}}
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">📝 Basic Information</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <x-icon name="pencil-square" class="w-5 h-5 text-gray-600" />
+                    <span>Basic Information</span>
+                </h3>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Produk <span class="text-red-500">*</span></label>
@@ -67,7 +73,10 @@
 
             {{-- Pricing & Stock --}}
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">💰 Pricing & Stock</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <x-icon name="banknotes" class="w-5 h-5 text-gray-600" />
+                    <span>Pricing & Stock</span>
+                </h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Harga Jual (Rp) <span class="text-red-500">*</span></label>
@@ -83,8 +92,9 @@
                             placeholder="0">
                     </div>
                 </div>
-                <div class="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
-                    💡 <strong>HPP</strong> = biaya produksi/pembelian. Keuntungan = Harga Jual − HPP.
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-700 flex items-center gap-2">
+                    <x-icon name="light-bulb" class="w-4 h-4 shrink-0 text-blue-600" />
+                    <span><strong>HPP</strong> = biaya produksi/pembelian. Keuntungan = Harga Jual − HPP.</span>
                 </div>
 
                 {{-- Sizes --}}
@@ -102,7 +112,10 @@
                             </select>
                             <input type="number" name="stock_per_size[]" placeholder="Stok" min="0"
                                 class="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                            <button type="button" class="remove-size text-red-500 hover:text-red-700 text-sm font-medium">✕ Hapus</button>
+                            <button type="button" class="remove-size inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium">
+                                <x-icon name="x-mark" class="w-4 h-4" />
+                                <span>Hapus</span>
+                            </button>
                         </div>
                     </div>
                     <button type="button" id="add-size"
@@ -117,7 +130,10 @@
 
             {{-- Images --}}
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">🖼️ Gambar Produk</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <x-icon name="image" class="w-5 h-5 text-gray-600" />
+                    <span>Gambar Produk</span>
+                </h3>
 
                 {{-- Primary Image --}}
                 <div class="mb-4">
@@ -129,12 +145,17 @@
                         <img id="primary_preview" src="#" alt="preview"
                              class="mx-auto h-32 object-contain rounded mb-2 hidden">
                         <div id="primary_placeholder">
-                            <p class="text-3xl mb-2">📷</p>
+                            <div class="mb-2 flex justify-center text-gray-400">
+                                <x-icon name="camera" class="w-8 h-8" />
+                            </div>
                             <p class="text-gray-400 text-sm font-medium">Klik untuk upload foto utama</p>
                             <p class="text-gray-300 text-xs mt-1">PNG, JPG, WebP — Max 2MB</p>
                         </div>
                     </div>
-                    <p id="primary_filename" class="text-xs text-green-600 mt-1 font-medium hidden"></p>
+                    <p id="primary_filename" class="text-xs text-green-600 mt-1 font-medium hidden items-center gap-1">
+                        <x-icon name="check" class="w-3.5 h-3.5 shrink-0" />
+                        <span id="primary_filename_text"></span>
+                    </p>
                     <input type="file" id="primary_image_input" name="primary_image"
                            accept="image/*" required class="hidden"
                            onchange="previewPrimary(this)">
@@ -150,8 +171,13 @@
                          onclick="document.getElementById('additional_images_input').click()">
                         <div id="additional_previews" class="flex flex-wrap gap-2 justify-center mb-2 hidden"></div>
                         <div id="additional_placeholder">
-                            <p class="text-2xl mb-1">🗂</p>
-                            <p class="text-gray-400 text-sm">Klik untuk upload foto tambahan</p>
+                            <div id="additional_icon_default" class="mb-1 flex justify-center text-gray-400">
+                                <x-icon name="folder-plus" class="w-7 h-7" />
+                            </div>
+                            <div id="additional_icon_done" class="mb-1 hidden justify-center text-green-600">
+                                <x-icon name="check-circle" class="w-7 h-7" />
+                            </div>
+                            <p id="additional_placeholder_text" class="text-gray-400 text-sm">Klik untuk upload foto tambahan</p>
                             <p class="text-gray-300 text-xs mt-1">Bisa pilih beberapa sekaligus</p>
                         </div>
                     </div>
@@ -163,7 +189,10 @@
 
             {{-- Pre-order --}}
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">⏳ Pre-order Settings</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <x-icon name="clock" class="w-5 h-5 text-gray-600" />
+                    <span>Pre-order Settings</span>
+                </h3>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" name="is_preorder" value="1" id="is_preorder"
                         {{ old('is_preorder') ? 'checked' : '' }}
@@ -189,7 +218,10 @@
 
             {{-- Status --}}
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">🔧 Status</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <x-icon name="wrench" class="w-5 h-5 text-gray-600" />
+                    <span>Status</span>
+                </h3>
                 <div class="space-y-3">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" name="is_active" value="1" checked
@@ -200,7 +232,10 @@
                         <input type="checkbox" name="is_featured_home" value="1"
                             {{ old('is_featured_home') ? 'checked' : '' }}
                             class="w-4 h-4 accent-blue-600">
-                        <span class="text-sm text-gray-700">📌 Featured di Home</span>
+                        <span class="text-sm text-gray-700 inline-flex items-center gap-1.5">
+                            <x-icon name="pin" class="w-4 h-4 text-blue-600" />
+                            <span>Featured di Home</span>
+                        </span>
                     </label>
                 </div>
             </div>
@@ -208,8 +243,9 @@
             {{-- Buttons --}}
             <div class="flex gap-3">
                 <button type="submit"
-                    class="flex-1 bg-gray-900 text-white px-4 py-2.5 rounded-lg hover:bg-gray-800 transition font-medium">
-                    ✓ Buat Produk
+                    class="flex-1 bg-gray-900 text-white px-4 py-2.5 rounded-lg hover:bg-gray-800 transition font-medium inline-flex items-center justify-center gap-2">
+                    <x-icon name="check" class="w-4 h-4" />
+                    <span>Buat Produk</span>
                 </button>
                 <a href="{{ route('admin.products.index') }}"
                     class="px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm text-center">
@@ -240,7 +276,10 @@
             </select>
             <input type="number" name="stock_per_size[]" placeholder="Stok" min="0"
                 class="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm">
-            <button type="button" class="remove-size text-red-500 hover:text-red-700 text-sm font-medium">✕ Hapus</button>
+            <button type="button" class="remove-size inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                <span>Hapus</span>
+            </button>
         `;
         container.appendChild(row);
         row.querySelector('.remove-size').addEventListener('click', () => row.remove());
@@ -258,14 +297,16 @@
         const preview = document.getElementById('primary_preview');
         const placeholder = document.getElementById('primary_placeholder');
         const filename = document.getElementById('primary_filename');
+        const filenameText = document.getElementById('primary_filename_text');
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = e => {
                 preview.src = e.target.result;
                 preview.classList.remove('hidden');
                 placeholder.classList.add('hidden');
-                filename.textContent = '✓ ' + input.files[0].name;
+                filenameText.textContent = input.files[0].name;
                 filename.classList.remove('hidden');
+                filename.classList.add('flex');
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -274,7 +315,9 @@
     // Additional images preview
     function previewAdditional(input) {
         const container = document.getElementById('additional_previews');
-        const placeholder = document.getElementById('additional_placeholder');
+        const defaultIcon = document.getElementById('additional_icon_default');
+        const doneIcon = document.getElementById('additional_icon_done');
+        const textEl = document.getElementById('additional_placeholder_text');
         container.innerHTML = '';
         if (input.files && input.files.length > 0) {
             Array.from(input.files).forEach(file => {
@@ -288,8 +331,12 @@
                 reader.readAsDataURL(file);
             });
             container.classList.remove('hidden');
-            placeholder.querySelector('p:first-child').textContent = '✓';
-            placeholder.querySelector('p:nth-child(2)').textContent = `${input.files.length} foto dipilih`;
+            defaultIcon.classList.add('hidden');
+            doneIcon.classList.remove('hidden');
+            doneIcon.classList.add('flex');
+            textEl.textContent = `${input.files.length} foto dipilih`;
+            textEl.classList.remove('text-gray-400');
+            textEl.classList.add('text-green-600', 'font-medium');
         }
     }
 </script>

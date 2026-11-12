@@ -15,7 +15,10 @@
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold mb-4">🔍 Cari & Filter Produk</h3>
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <x-icon name="search" class="w-5 h-5 text-gray-600" />
+            <span>Cari & Filter Produk</span>
+        </h3>
         <form method="GET" action="{{ route('karyawan.stock.index') }}" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -67,7 +70,9 @@
                                 @if($product->primaryImage)
                                 <img src="{{ $product->primaryImage->image_path }}" alt="{{ $product->name }}" loading="lazy" decoding="async" class="w-10 h-10 rounded object-cover">
                                 @else
-                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center">📷</div>
+                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400">
+                                    <x-icon name="camera" class="w-5 h-5" />
+                                </div>
                                 @endif
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $product->name }}</p>
@@ -114,11 +119,14 @@
 
     <!-- Info Box -->
     <div class="bg-blue-50 border-l-4 border-blue-400 rounded p-4">
-        <p class="font-semibold text-blue-900">💡 Tips Manajemen Stok</p>
+        <p class="font-semibold text-blue-900 flex items-center gap-1.5">
+            <x-icon name="light-bulb" class="w-4 h-4 text-blue-700" />
+            <span>Tips Manajemen Stok</span>
+        </p>
         <ul class="text-sm text-blue-800 mt-2 space-y-1">
-            <li>✓ Update stok setiap hari untuk mencegah overselling</li>
-            <li>✓ Perhatikan produk dengan stok kuning (< 10 unit) dan merah (habis)</li>
-            <li>✓ Catat perubahan stok dengan catatan jelas untuk audit trail</li>
+            <li class="flex items-center gap-1.5"><x-icon name="check" class="w-3.5 h-3.5 text-blue-700 shrink-0" /><span>Update stok setiap hari untuk mencegah overselling</span></li>
+            <li class="flex items-center gap-1.5"><x-icon name="check" class="w-3.5 h-3.5 text-blue-700 shrink-0" /><span>Perhatikan produk dengan stok kuning (< 10 unit) dan merah (habis)</span></li>
+            <li class="flex items-center gap-1.5"><x-icon name="check" class="w-3.5 h-3.5 text-blue-700 shrink-0" /><span>Catat perubahan stok dengan catatan jelas untuk audit trail</span></li>
         </ul>
     </div>
 </div>

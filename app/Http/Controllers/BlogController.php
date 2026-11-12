@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogComment;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
@@ -48,26 +49,37 @@ class BlogController extends Controller
     public function feed()
     {
         $posts = BlogPost::where('is_published', true)
+            ->whereNotNull('published_at')
+            ->with(['author', 'category'])
             ->latest('published_at')
             ->take(20)
             ->get();
 
-        return response()->view('blog.rss', compact('posts'))->header('Content-Type', 'text/xml');
+        return response()
+            ->view('blog.rss', compact('posts'))
+            ->header('Content-Type', 'text/xml; charset=utf-8');
+    }
+
+    public function feedStylesheet()
+    {
+        return response()
+            ->view('blog.rss-xsl')
+            ->header('Content-Type', 'text/xml; charset=utf-8');
     }
 
     public function storeComment(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'post_id' => 'required|exists:blog_posts,id',
             'content' => 'required|string|min:3',
             'parent_id' => 'nullable|exists:blog_comments,id',
         ]);
 
         BlogComment::create([
-            'post_id' => $request->post_id,
-            'user_id' => auth()->id(),
-            'parent_id' => $request->parent_id,
-            'content' => $request->content,
+            'post_id' => $validated['post_id'],
+            'user_id' => Auth::id(),
+            'parent_id' => $validated['parent_id'] ?? null,
+            'content' => $validated['content'],
             'is_approved' => false,
         ]);
 

@@ -165,7 +165,7 @@
                                         class="w-[300px] h-[300px] object-cover transition duration-700 group-hover/item:scale-105">
                                 @else
                                     <div class="w-full h-[300px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                         <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
+                                         <img src="{{ asset('images/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                                     </div>
                                 @endif
                             </div>
@@ -190,7 +190,7 @@
                                 <img src="{{ $product->primaryImage->image_path }}" alt="{{ $product->name }}" loading="lazy" decoding="async" class="w-full h-[300px] object-cover">
                             @else
                                 <div class="w-full h-[300px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                    <img src="{{ asset('storage/home/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
+                                    <img src="{{ asset('images/asset.png') }}" alt="No Image" loading="lazy" decoding="async" class="w-6 h-6">
                                 </div>
                             @endif
                         </a>
@@ -222,27 +222,80 @@
         <div class="grid md:grid-cols-3 gap-6">
 
             <!-- LEFT BIG -->
-            <div>
-                <img src="{{ $homeImages['editorial_image_1'] }}" loading="lazy" decoding="async" class="w-full h-[500px] object-cover">
-                <p class="mt-3 text-xs uppercase">Our Products</p>
-            </div>
+            <a href="{{ route('shop') }}" class="block group">
+                <div class="overflow-hidden">
+                    <img src="{{ $homeImages['editorial_image_1'] }}" alt="Our Products" loading="lazy" decoding="async" class="w-full h-[500px] object-cover transition duration-700 group-hover:scale-105">
+                </div>
+                <p class="mt-3 text-xs uppercase flex justify-between">
+                    Our Products <span class="group-hover:underline">Shop Now</span>
+                </p>
+            </a>
 
             <!-- MIDDLE -->
-            <div>
-                <img src="{{ $homeImages['editorial_image_2'] }}" loading="lazy" decoding="async" class="w-full h-[500px] object-cover">
+            <a href="{{ route('about') }}" class="block group">
+                <div class="overflow-hidden">
+                    <img src="{{ $homeImages['editorial_image_2'] }}" alt="About Us" loading="lazy" decoding="async" class="w-full h-[500px] object-cover transition duration-700 group-hover:scale-105">
+                </div>
                 <p class="mt-3 text-xs uppercase flex justify-between">
-                    About Us <span>Read More</span>
+                    About Us <span class="group-hover:underline">Read More</span>
                 </p>
-            </div>
+            </a>
 
             <!-- RIGHT -->
-            <div>
-                <img src="{{ $homeImages['editorial_image_3'] }}" loading="lazy" decoding="async" class="w-full h-[500px] object-cover">
-                <p class="mt-3 text-xs uppercase">Community</p>
-            </div>
+            <a href="{{ route('community') }}" class="block group">
+                <div class="overflow-hidden">
+                    <img src="{{ $homeImages['editorial_image_3'] }}" alt="Community" loading="lazy" decoding="async" class="w-full h-[500px] object-cover transition duration-700 group-hover:scale-105">
+                </div>
+                <p class="mt-3 text-xs uppercase flex justify-between">
+                    Community <span class="group-hover:underline">Explore</span>
+                </p>
+            </a>
 
         </div>
 
+    </section>
+
+    <!-- ================= JOURNAL ================= -->
+    <section data-theme="light" class="bg-white px-10 py-20 text-black border-t border-gray-100">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
+                <span class="text-xs tracking-[0.3em] uppercase">( The Journal )</span>
+                <div class="flex items-center gap-6 text-xs uppercase tracking-widest">
+                    <a href="{{ route('blog.index') }}" class="hover:opacity-60 transition">All Stories &rarr;</a>
+                    <a href="{{ route('blog.feed') }}" class="text-gray-400 hover:text-black transition">RSS</a>
+                </div>
+            </div>
+
+            @if(isset($posts) && $posts->isNotEmpty())
+                <div class="grid md:grid-cols-3 gap-8">
+                    @foreach($posts as $post)
+                        <a href="{{ route('blog.show', $post->slug) }}" class="block group">
+                            <div class="overflow-hidden bg-gray-100 mb-4">
+                                <img src="{{ $post->featured_image ?? asset('images/asset.png') }}"
+                                     alt="{{ $post->title }}"
+                                     loading="lazy"
+                                     decoding="async"
+                                     class="w-full h-64 object-cover transition duration-700 group-hover:scale-105">
+                            </div>
+                            <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">
+                                {{ optional($post->published_at)->format('M d, Y') ?? $post->created_at?->format('M d, Y') }}
+                                @if($post->category)
+                                    &bull; {{ $post->category->name }}
+                                @endif
+                            </p>
+                            <h3 class="text-base font-medium group-hover:opacity-70 transition">{{ $post->title }}</h3>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="py-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-gray-200 px-6">
+                    <p class="text-sm text-gray-600">Stories, style guides, and cultural commentary from JJHOUSE.</p>
+                    <a href="{{ route('blog.index') }}" class="text-xs uppercase tracking-widest underline underline-offset-4 hover:opacity-60 transition">
+                        Visit Journal
+                    </a>
+                </div>
+            @endif
+        </div>
     </section>
 
 

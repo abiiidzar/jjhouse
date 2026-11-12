@@ -23,7 +23,9 @@
                         <p class="text-3xl font-bold text-green-600 mt-2">Rp {{ number_format($paymentMethods['cash'], 0, ',', '.') }}</p>
                         <p class="text-xs text-gray-500 mt-2">Pembayaran tunai masuk</p>
                     </div>
-                    <div class="text-5xl text-green-200">💵</div>
+                    <div class="p-3 rounded-lg bg-green-50 text-green-500">
+                        <x-icon name="banknotes" class="w-9 h-9" />
+                    </div>
                 </div>
             </div>
 
@@ -35,7 +37,9 @@
                         <p class="text-3xl font-bold text-blue-600 mt-2">Rp {{ number_format($paymentMethods['transfer'], 0, ',', '.') }}</p>
                         <p class="text-xs text-gray-500 mt-2">Transfer bank masuk</p>
                     </div>
-                    <div class="text-5xl text-blue-200">🏦</div>
+                    <div class="p-3 rounded-lg bg-blue-50 text-blue-500">
+                        <x-icon name="building-library" class="w-9 h-9" />
+                    </div>
                 </div>
             </div>
 
@@ -47,7 +51,9 @@
                         <p class="text-3xl font-bold text-purple-600 mt-2">Rp {{ number_format($paymentMethods['card'], 0, ',', '.') }}</p>
                         <p class="text-xs text-gray-500 mt-2">Pembayaran kartu masuk</p>
                     </div>
-                    <div class="text-5xl text-purple-200">💳</div>
+                    <div class="p-3 rounded-lg bg-purple-50 text-purple-500">
+                        <x-icon name="credit-card" class="w-9 h-9" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,25 +70,28 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <!-- Breakdown Table -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">📊 Ringkasan Metode Pembayaran</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <x-icon name="chart-bar" class="w-5 h-5 text-gray-700" />
+                    <span>Ringkasan Metode Pembayaran</span>
+                </h2>
                 <div class="space-y-4">
                     <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">💵</span>
+                            <x-icon name="banknotes" class="w-6 h-6 text-green-600" />
                             <p class="font-semibold text-gray-700">Tunai</p>
                         </div>
                         <p class="text-xl font-bold text-green-600">Rp {{ number_format($paymentMethods['cash'], 0, ',', '.') }}</p>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">🏦</span>
+                            <x-icon name="building-library" class="w-6 h-6 text-blue-600" />
                             <p class="font-semibold text-gray-700">Transfer</p>
                         </div>
                         <p class="text-xl font-bold text-blue-600">Rp {{ number_format($paymentMethods['transfer'], 0, ',', '.') }}</p>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">💳</span>
+                            <x-icon name="credit-card" class="w-6 h-6 text-purple-600" />
                             <p class="font-semibold text-gray-700">Kartu Kredit</p>
                         </div>
                         <p class="text-xl font-bold text-purple-600">Rp {{ number_format($paymentMethods['card'], 0, ',', '.') }}</p>
@@ -92,7 +101,10 @@
 
             <!-- Percentage Breakdown -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">🎯 Persentase Pembayaran</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <x-icon name="target" class="w-5 h-5 text-gray-700" />
+                    <span>Persentase Pembayaran</span>
+                </h2>
                 @php
                     $total = $paymentMethods['cash'] + $paymentMethods['transfer'] + $paymentMethods['card'];
                     $cashPercent = $total > 0 ? ($paymentMethods['cash'] / $total) * 100 : 0;
@@ -133,7 +145,10 @@
 
         <!-- Transaction History -->
         <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">💰 Riwayat Transaksi Hari Ini</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <x-icon name="banknotes" class="w-5 h-5 text-green-600" />
+                <span>Riwayat Transaksi Hari Ini</span>
+            </h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50">
@@ -178,11 +193,13 @@
 
         <!-- Print & Export -->
         <div class="mt-6 flex gap-3 justify-end">
-            <button onclick="window.print()" class="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 font-medium">
-                🖨️ Cetak Laporan
+            <button onclick="window.print()" class="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 font-medium inline-flex items-center gap-2">
+                <x-icon name="printer" class="w-4 h-4" />
+                <span>Cetak Laporan</span>
             </button>
-            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                📥 Export Excel
+            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium inline-flex items-center gap-2">
+                <x-icon name="arrow-down-tray" class="w-4 h-4" />
+                <span>Export Excel</span>
             </button>
         </div>
     </div>

@@ -64,11 +64,20 @@
                         </td>
                         <td class="px-4 py-2 text-center text-sm">
                             @if($size->stock == 0)
-                                🔴 Out of Stock
+                                <span class="inline-flex items-center gap-1.5">
+                                    <x-icon name="dot" class="w-3 h-3 text-red-500" />
+                                    <span>Out of Stock</span>
+                                </span>
                             @elseif($size->stock < 5)
-                                🟡 Low Stock
+                                <span class="inline-flex items-center gap-1.5">
+                                    <x-icon name="dot" class="w-3 h-3 text-yellow-500" />
+                                    <span>Low Stock</span>
+                                </span>
                             @else
-                                🟢 In Stock
+                                <span class="inline-flex items-center gap-1.5">
+                                    <x-icon name="dot" class="w-3 h-3 text-green-500" />
+                                    <span>In Stock</span>
+                                </span>
                             @endif
                         </td>
                         <td class="px-4 py-2 text-center">{{ $size->stockHistories->count() }}</td>
@@ -82,7 +91,10 @@
     <!-- History Table -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">📊 Complete History</h3>
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <x-icon name="chart-bar" class="w-5 h-5 text-gray-700" />
+                <span>Complete History</span>
+            </h3>
         </div>
         <table class="w-full">
             <thead class="bg-gray-50 border-b border-gray-200">

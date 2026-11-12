@@ -13,4 +13,8 @@ class NewsletterSubscription extends Model
         'is_active',
         'unsubscribe_token'
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

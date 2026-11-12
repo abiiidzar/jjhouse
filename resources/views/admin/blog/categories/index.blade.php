@@ -32,11 +32,24 @@
                     <p class="font-medium">{{ $category->name }}</p>
                     <p class="text-xs text-gray-400">{{ $category->posts_count }} posts</p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="editCategory({{ $category->id }}, '{{ $category->name }}')" class="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+                <div class="flex items-center gap-1.5">
+                    <button type="button"
+                            onclick="editCategory({{ $category->id }}, '{{ $category->name }}')"
+                            title="Edit"
+                            aria-label="Edit"
+                            class="p-1.5 rounded-lg text-blue-600 hover:text-blue-900 hover:bg-blue-50 transition inline-flex items-center justify-center">
+                        <x-icon name="pencil-square" class="w-4 h-4" />
+                        <span class="sr-only">Edit</span>
+                    </button>
                     <form action="{{ route('admin.blog.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Delete this category?')">
                         @csrf @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                        <button type="submit"
+                                title="Delete"
+                                aria-label="Delete"
+                                class="p-1.5 rounded-lg text-red-600 hover:text-red-900 hover:bg-red-50 transition inline-flex items-center justify-center">
+                            <x-icon name="trash" class="w-4 h-4" />
+                            <span class="sr-only">Delete</span>
+                        </button>
                     </form>
                 </div>
             </div>

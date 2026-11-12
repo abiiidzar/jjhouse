@@ -20,7 +20,9 @@
                     <p class="text-gray-600 text-sm">Total Pendapatan Minggu Ini</p>
                     <p class="text-4xl font-bold text-green-600">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
                 </div>
-                <div class="text-6xl text-green-200">📊</div>
+                <div class="p-3 rounded-lg bg-green-50 text-green-500">
+                    <x-icon name="chart-bar" class="w-10 h-10" />
+                </div>
             </div>
         </div>
 
@@ -39,7 +41,10 @@
 
         <!-- Chart Placeholder -->
         <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">📈 Grafik Penjualan Harian</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <x-icon name="trending-up" class="w-5 h-5 text-blue-600" />
+                <span>Grafik Penjualan Harian</span>
+            </h2>
             <div class="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
                 <p class="text-gray-500">Grafik akan ditampilkan di sini (integrasi Chart.js atau Recharts)</p>
             </div>
@@ -63,8 +68,9 @@
 
         <!-- Print Button -->
         <div class="mt-6 text-right">
-            <button onclick="window.print()" class="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 font-medium">
-                🖨️ Cetak Laporan
+            <button onclick="window.print()" class="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 font-medium inline-flex items-center gap-2">
+                <x-icon name="printer" class="w-4 h-4" />
+                <span>Cetak Laporan</span>
             </button>
         </div>
     </div>

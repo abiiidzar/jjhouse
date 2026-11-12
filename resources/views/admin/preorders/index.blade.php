@@ -77,7 +77,13 @@
                                 @if(!$item->preorder_ready_at)
                                 <form action="{{ route('admin.preorders.ready', $item) }}" method="POST" class="inline">
                                     @csrf
-                                    <button type="submit" class="text-green-600 hover:text-green-800 text-sm">Mark Ready</button>
+                                    <button type="submit"
+                                            title="Mark Ready"
+                                            aria-label="Mark Ready"
+                                            class="p-1.5 rounded-lg text-green-600 hover:text-green-900 hover:bg-green-50 transition inline-flex items-center justify-center">
+                                        <x-icon name="check-circle" class="w-4 h-4" />
+                                        <span class="sr-only">Mark Ready</span>
+                                    </button>
                                 </form>
                                 @endif
                              </td>

@@ -109,8 +109,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Blog routes
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/blog/feed', [BlogController::class, 'feed'])->name('blog.feed');
+Route::get('/blog/feed.xsl', [BlogController::class, 'feedStylesheet'])->name('blog.feed.xsl');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Community page
 Route::get('/community', function () {
@@ -221,6 +222,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
         'destroy' => 'newsletter.subscribers.destroy',
 
     ]);
+    Route::patch('newsletter/subscribers/{subscriber}/toggle-status',
+        [NewsletterController::class, 'toggleStatus']
+    )->name('newsletter.subscribers.toggle-status');
     Route::get('newsletter/subscribers/export',
             [NewsletterController::class, 'export']
         )->name('newsletter.subscribers.export');

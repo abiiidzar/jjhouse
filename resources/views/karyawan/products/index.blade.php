@@ -91,12 +91,17 @@
                                 @if($product->primaryImage)
                                 <img src="{{ $product->primaryImage->image_path }}" alt="{{ $product->name }}" loading="lazy" decoding="async" class="w-8 h-8 rounded object-cover">
                                 @else
-                                <div class="w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-xs">📷</div>
+                                <div class="w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-gray-400">
+                                    <x-icon name="camera" class="w-4 h-4" />
+                                </div>
                                 @endif
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $product->name }}</p>
                                     @if($product->is_preorder)
-                                    <p class="text-xs text-orange-600">📌 Pre-order</p>
+                                    <p class="text-xs text-orange-600 inline-flex items-center gap-1">
+                                        <x-icon name="pin" class="w-3 h-3" />
+                                        <span>Pre-order</span>
+                                    </p>
                                     @endif
                                 </div>
                             </div>
@@ -113,8 +118,13 @@
                         </td>
                         <td class="px-4 py-3 text-right font-medium">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-center">
-                            <span class="px-2 py-1 rounded text-xs {{ $product->is_active ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $product->is_active ? '✓ Aktif' : 'Nonaktif' }}
+                            <span class="px-2 py-1 rounded text-xs inline-flex items-center gap-1 {{ $product->is_active ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                @if($product->is_active)
+                                    <x-icon name="check" class="w-3 h-3" />
+                                    <span>Aktif</span>
+                                @else
+                                    <span>Nonaktif</span>
+                                @endif
                             </span>
                         </td>
                         <td class="px-4 py-3 text-center">

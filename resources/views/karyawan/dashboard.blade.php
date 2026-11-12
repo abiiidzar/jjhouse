@@ -16,7 +16,9 @@
                     <p class="text-3xl font-bold text-blue-600 mt-2">{{ $totalStock }}</p>
                     <p class="text-xs text-gray-500 mt-2">Unit tersedia</p>
                 </div>
-                <div class="text-4xl text-blue-100">📦</div>
+                <div class="p-2.5 rounded-lg bg-blue-50 text-blue-500">
+                    <x-icon name="cube" class="w-8 h-8" />
+                </div>
             </div>
         </div>
 
@@ -28,7 +30,9 @@
                     <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $pendingOrders }}</p>
                     <a href="{{ route('karyawan.orders.index') }}?status=pending" class="text-xs text-yellow-600 hover:text-yellow-800 mt-2 inline-block">Lihat detail →</a>
                 </div>
-                <div class="text-4xl text-yellow-100">⏳</div>
+                <div class="p-2.5 rounded-lg bg-yellow-50 text-yellow-500">
+                    <x-icon name="clock" class="w-8 h-8" />
+                </div>
             </div>
         </div>
 
@@ -40,7 +44,9 @@
                     <p class="text-3xl font-bold text-orange-600 mt-2">{{ $processingOrders }}</p>
                     <a href="{{ route('karyawan.orders.index') }}?status=processing" class="text-xs text-orange-600 hover:text-orange-800 mt-2 inline-block">Lihat detail →</a>
                 </div>
-                <div class="text-4xl text-orange-100">🔄</div>
+                <div class="p-2.5 rounded-lg bg-orange-50 text-orange-500">
+                    <x-icon name="arrow-path" class="w-8 h-8" />
+                </div>
             </div>
         </div>
 
@@ -52,7 +58,9 @@
                     <p class="text-3xl font-bold text-green-600 mt-2">{{ $readyToShipOrders }}</p>
                     <a href="{{ route('karyawan.orders.index') }}?status=ready_to_ship" class="text-xs text-green-600 hover:text-green-800 mt-2 inline-block">Lihat detail →</a>
                 </div>
-                <div class="text-4xl text-green-100">✅</div>
+                <div class="p-2.5 rounded-lg bg-green-50 text-green-500">
+                    <x-icon name="check-circle" class="w-8 h-8" />
+                </div>
             </div>
         </div>
     </div>
@@ -61,7 +69,10 @@
         <!-- Stok Rendah (Low Stock) -->
         <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-gray-800">⚠️ Produk Stok Rendah</h2>
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <x-icon name="exclamation-triangle" class="w-5 h-5 text-red-500" />
+                    <span>Produk Stok Rendah</span>
+                </h2>
                 <span class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full font-semibold">{{ $lowStockCount }} Produk</span>
             </div>
             
@@ -82,16 +93,24 @@
                     @endforeach
                 </div>
             @else
-                <p class="text-gray-500 text-center py-4">✓ Semua produk memiliki stok yang cukup</p>
+                <p class="text-gray-500 text-center py-4 inline-flex items-center justify-center gap-1.5 w-full">
+                    <x-icon name="check" class="w-4 h-4 text-green-600" />
+                    <span>Semua produk memiliki stok yang cukup</span>
+                </p>
             @endif
         </div>
 
         <!-- Quick Actions -->
         <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">📋 Menu Cepat</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <x-icon name="clipboard-list" class="w-5 h-5 text-gray-700" />
+                <span>Menu Cepat</span>
+            </h2>
             <div class="space-y-3">
                 <a href="{{ route('karyawan.stock.index') }}" class="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
-                    <span class="text-2xl mr-3">📊</span>
+                    <span class="mr-3 text-blue-600">
+                        <x-icon name="chart-bar" class="w-6 h-6" />
+                    </span>
                     <div class="flex-1">
                         <p class="font-semibold text-blue-900">Kelola Stok</p>
                         <p class="text-xs text-blue-700">Update stok produk</p>
@@ -100,7 +119,9 @@
                 </a>
 
                 <a href="{{ route('karyawan.orders.index') }}" class="flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition">
-                    <span class="text-2xl mr-3">📦</span>
+                    <span class="mr-3 text-purple-600">
+                        <x-icon name="cube" class="w-6 h-6" />
+                    </span>
                     <div class="flex-1">
                         <p class="font-semibold text-purple-900">Pesanan Baru</p>
                         <p class="text-xs text-purple-700">Proses pesanan masuk</p>
@@ -109,7 +130,9 @@
                 </a>
 
                 <a href="{{ route('karyawan.products.index') }}" class="flex items-center p-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition">
-                    <span class="text-2xl mr-3">📋</span>
+                    <span class="mr-3 text-indigo-600">
+                        <x-icon name="clipboard-list" class="w-6 h-6" />
+                    </span>
                     <div class="flex-1">
                         <p class="font-semibold text-indigo-900">Daftar Produk</p>
                         <p class="text-xs text-indigo-700">Lihat semua produk</p>
@@ -123,7 +146,10 @@
     <!-- Orders to Process -->
     <div class="bg-white rounded-lg shadow p-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-800">🎯 Pesanan Butuh Tindakan</h2>
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <x-icon name="target" class="w-5 h-5 text-blue-600" />
+                <span>Pesanan Butuh Tindakan</span>
+            </h2>
             <a href="{{ route('karyawan.orders.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat semua</a>
         </div>
 
@@ -173,20 +199,26 @@
     <!-- Information Box -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded p-4">
-            <p class="font-semibold text-yellow-900">💡 Tips Penting</p>
+            <p class="font-semibold text-yellow-900 flex items-center gap-1.5">
+                <x-icon name="light-bulb" class="w-4 h-4 text-yellow-700" />
+                <span>Tips Penting</span>
+            </p>
             <ul class="text-sm text-yellow-800 mt-2 space-y-1">
-                <li>✓ Update stok setiap hari untuk menghindari overselling</li>
-                <li>✓ Prioritaskan pesanan yang lebih dulu masuk</li>
-                <li>✓ Catat semua perubahan stok dengan catatan yang jelas</li>
+                <li class="flex items-center gap-1.5"><x-icon name="check" class="w-3.5 h-3.5 text-yellow-700 shrink-0" /><span>Update stok setiap hari untuk menghindari overselling</span></li>
+                <li class="flex items-center gap-1.5"><x-icon name="check" class="w-3.5 h-3.5 text-yellow-700 shrink-0" /><span>Prioritaskan pesanan yang lebih dulu masuk</span></li>
+                <li class="flex items-center gap-1.5"><x-icon name="check" class="w-3.5 h-3.5 text-yellow-700 shrink-0" /><span>Catat semua perubahan stok dengan catatan yang jelas</span></li>
             </ul>
         </div>
 
         <div class="bg-blue-50 border-l-4 border-blue-400 rounded p-4">
-            <p class="font-semibold text-blue-900">📌 Status Pesanan</p>
+            <p class="font-semibold text-blue-900 flex items-center gap-1.5">
+                <x-icon name="pin" class="w-4 h-4 text-blue-700" />
+                <span>Status Pesanan</span>
+            </p>
             <ul class="text-sm text-blue-800 mt-2 space-y-1">
-                <li>🟡 <strong>Pending</strong> = Pesanan baru, belum dikemas</li>
-                <li>🟠 <strong>Processing</strong> = Sedang dikemas</li>
-                <li>🟢 <strong>Ready to Ship</strong> = Siap dikirim ke kurir</li>
+                <li class="flex items-center gap-1.5"><x-icon name="dot" class="w-3 h-3 text-yellow-500 shrink-0" /><span><strong>Pending</strong> = Pesanan baru, belum dikemas</span></li>
+                <li class="flex items-center gap-1.5"><x-icon name="dot" class="w-3 h-3 text-orange-500 shrink-0" /><span><strong>Processing</strong> = Sedang dikemas</span></li>
+                <li class="flex items-center gap-1.5"><x-icon name="dot" class="w-3 h-3 text-green-500 shrink-0" /><span><strong>Ready to Ship</strong> = Siap dikirim ke kurir</span></li>
             </ul>
         </div>
     </div>

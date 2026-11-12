@@ -55,11 +55,23 @@
                     </td>
                     <td class="px-6 py-4 text-sm">{{ $post->published_at ? $post->published_at->format('d M Y') : '-' }}</td>
                     <td class="px-6 py-4">
-                        <div class="flex gap-2">
-                            <a href="{{ route('admin.blog.posts.edit', $post) }}" class="text-blue-600 hover:text-blue-800">Edit</a>
+                        <div class="flex items-center gap-1.5">
+                            <a href="{{ route('admin.blog.posts.edit', $post) }}"
+                               title="Edit"
+                               aria-label="Edit"
+                               class="p-1.5 rounded-lg text-blue-600 hover:text-blue-900 hover:bg-blue-50 transition inline-flex items-center justify-center">
+                                <x-icon name="pencil-square" class="w-4 h-4" />
+                                <span class="sr-only">Edit</span>
+                            </a>
                             <form action="{{ route('admin.blog.posts.destroy', $post) }}" method="POST" onsubmit="return confirm('Delete this post?')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                                <button type="submit"
+                                        title="Delete"
+                                        aria-label="Delete"
+                                        class="p-1.5 rounded-lg text-red-600 hover:text-red-900 hover:bg-red-50 transition inline-flex items-center justify-center">
+                                    <x-icon name="trash" class="w-4 h-4" />
+                                    <span class="sr-only">Delete</span>
+                                </button>
                             </form>
                         </div>
                     </td>

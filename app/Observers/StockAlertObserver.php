@@ -27,19 +27,24 @@ class StockAlertObserver
                     'current_stock' => $stock,
                     'threshold' => $threshold,
                     'status' => 'active',
+                    'first_triggered_at' => now(),
                 ]);
             } elseif ($existingAlert->status === 'resolved') {
                 // Re-activate a resolved alert if stock drops again
                 $existingAlert->update([
                     'current_stock' => $stock,
                     'status' => 'active',
+                    'first_triggered_at' => $existingAlert->first_triggered_at ?? now(),
                     'acknowledged_by' => null,
                     'acknowledged_at' => null,
-                    'notes' => null,
+                    'acknowledgment_notes' => null,
                 ]);
             } else {
-                // Update existing active/acknowledged alert
-                $existingAlert->update(['current_stock' => $stock]);
+                // Update existing active/acknowledged alert and backfill null trigger timestamp
+                $existingAlert->update([
+                    'current_stock' => $stock,
+                    'first_triggered_at' => $existingAlert->first_triggered_at ?? now(),
+                ]);
             }
         } elseif ($existingAlert && $existingAlert->status !== 'resolved') {
             // Resolve the alert if stock is back above the threshold
